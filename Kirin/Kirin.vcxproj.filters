@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{c32012e1-800b-4ffe-9989-4573538b9b14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform">
+      <UniqueIdentifier>{699c2212-0215-4cd9-bf2c-404ee9cda3c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_externalbin">
+      <UniqueIdentifier>{afbbb8a9-29ba-42d7-b8fd-b9867cd770cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdparty">
+      <UniqueIdentifier>{854daf74-af30-4b66-8ab0-7673a8299f98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdparty\glad">
+      <UniqueIdentifier>{2aceead9-bcfa-4b17-85bf-f961dae9f8b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\SDL2\lib\x64\SDL2.dll">
+      <Filter>_externalbin</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\SDL2\lib\x86\SDL2.dll">
+      <Filter>_externalbin</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="common\Color.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Standard.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Time.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Math.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Space.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Input.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\CString.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\SDL2Input.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\Window.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="common\File.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\View.c">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\WindowBackendGL.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\Draw.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\DrawBackendGL.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\Shader.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\DrawBackendShaderGL.c">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\glad\glad.c">
+      <Filter>thirdparty\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="common\BinWriter.c">
+      <Filter>common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common\Color.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Defines.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Standard.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Time.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Math.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Space.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Keycodes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Input.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\CString.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\SDL2Input.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\Window.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="common\File.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\View.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\WindowBackendGL.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\WindowBackend.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\DrawBackend.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\Draw.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\DrawBackendGL.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\Shader.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\DrawBackendShaderGL.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\glad\glad.h">
+      <Filter>thirdparty\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\glad\khrplatform.h">
+      <Filter>thirdparty\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="common\BinWriter.h">
+      <Filter>common</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
