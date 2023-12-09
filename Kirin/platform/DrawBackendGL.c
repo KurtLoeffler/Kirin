@@ -131,7 +131,9 @@ static void ApplyMeshStructure(Mesh* mesh)
 {
 	static int32 typeToGLType[] = {
 		[VertexFormatType_Float] = GL_FLOAT,
+		[VertexFormatType_Byte] = GL_UNSIGNED_BYTE,
 	};
+	static_assert(VertexFormatType_Count == 3, "enum has changed.");
 
 #if CONFIG_DEBUG
 	if (mesh->internalHandle == 0)
