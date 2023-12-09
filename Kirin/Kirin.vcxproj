@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c2be5da4-df63-4f8c-9508-03b5f991153c}</ProjectGuid>
+    <ProjectGuid>{44511278-0BC4-4951-A13E-CF59FD60CC61}</ProjectGuid>
     <RootNamespace>Kirin</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
