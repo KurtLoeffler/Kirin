@@ -9,7 +9,7 @@
 #endif
 
 #if CONFIG_DEBUG+CONFIG_RELEASE != 1
-#error exactly one of the following must be defined: VAIN_CONFIG_DEBUG, VAIN_CONFIG_RELEASE
+#error exactly one of the following must be defined: CONFIG_DEBUG, CONFIG_RELEASE
 #endif
 
 #ifndef PLATFORM_WINDOWS
@@ -17,7 +17,7 @@
 #endif
 
 #if PLATFORM_WINDOWS != 1
-#error exactly one of the following must be defined: VAIN_PLATFORM_WINDOWS
+#error exactly one of the following must be defined: PLATFORM_WINDOWS
 #endif
 
 #if PLATFORM_WINDOWS
