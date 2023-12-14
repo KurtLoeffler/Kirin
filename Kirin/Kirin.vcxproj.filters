@@ -16,6 +16,9 @@
     <Filter Include="thirdparty\glad">
       <UniqueIdentifier>{2aceead9-bcfa-4b17-85bf-f961dae9f8b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="platform\gl">
+      <UniqueIdentifier>{1075e276-b817-44ac-b178-b38eaed0fc76}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\SDL2\lib\x64\SDL2.dll">
@@ -59,19 +62,10 @@
     <ClCompile Include="common\View.c">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="platform\WindowBackendGL.c">
-      <Filter>platform</Filter>
-    </ClCompile>
     <ClCompile Include="platform\Draw.c">
       <Filter>platform</Filter>
     </ClCompile>
-    <ClCompile Include="platform\DrawBackendGL.c">
-      <Filter>platform</Filter>
-    </ClCompile>
     <ClCompile Include="platform\Shader.c">
-      <Filter>platform</Filter>
-    </ClCompile>
-    <ClCompile Include="platform\DrawBackendShaderGL.c">
       <Filter>platform</Filter>
     </ClCompile>
     <ClCompile Include="thirdparty\glad\glad.c">
@@ -82,6 +76,15 @@
     </ClCompile>
     <ClCompile Include="platform\Mesh.c">
       <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\gl\DrawBackendGL.c">
+      <Filter>platform\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\gl\DrawBackendShaderGL.c">
+      <Filter>platform\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\gl\WindowBackendGL.c">
+      <Filter>platform\gl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,9 +127,6 @@
     <ClInclude Include="common\View.h">
       <Filter>common</Filter>
     </ClInclude>
-    <ClInclude Include="platform\WindowBackendGL.h">
-      <Filter>platform</Filter>
-    </ClInclude>
     <ClInclude Include="platform\WindowBackend.h">
       <Filter>platform</Filter>
     </ClInclude>
@@ -136,13 +136,7 @@
     <ClInclude Include="platform\Draw.h">
       <Filter>platform</Filter>
     </ClInclude>
-    <ClInclude Include="platform\DrawBackendGL.h">
-      <Filter>platform</Filter>
-    </ClInclude>
     <ClInclude Include="platform\Shader.h">
-      <Filter>platform</Filter>
-    </ClInclude>
-    <ClInclude Include="platform\DrawBackendShaderGL.h">
       <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="thirdparty\glad\glad.h">
@@ -156,6 +150,15 @@
     </ClInclude>
     <ClInclude Include="platform\Mesh.h">
       <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\gl\DrawBackendGL.h">
+      <Filter>platform\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\gl\DrawBackendShaderGL.h">
+      <Filter>platform\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\gl\WindowBackendGL.h">
+      <Filter>platform\gl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

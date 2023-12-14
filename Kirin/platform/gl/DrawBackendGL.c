@@ -1,9 +1,9 @@
-#include "platform/DrawBackendGL.h"
+#include "platform/gl/DrawBackendGL.h"
 
 #include "common/Space.h"
 #include "common/CString.h"
 #include "platform/Draw.h"
-#include "platform/DrawBackendShaderGL.h"
+#include "platform/gl/DrawBackendShaderGL.h"
 
 #include "thirdparty/glad/glad.h"
 
