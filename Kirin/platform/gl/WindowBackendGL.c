@@ -84,7 +84,7 @@ static void Present(Window* window)
 	SDL_GL_SwapWindow(sdlWindow);
 }
 
-void VSyncChanged(Window* window)
+static void VSyncChanged(Window* window)
 {
 	if (window->vSync)
 	{
