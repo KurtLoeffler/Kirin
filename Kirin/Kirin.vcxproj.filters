@@ -86,6 +86,12 @@
     <ClCompile Include="platform\gl\WindowBackendGL.c">
       <Filter>platform\gl</Filter>
     </ClCompile>
+    <ClCompile Include="platform\gl\MeshGL.c">
+      <Filter>platform\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\gl\CommonGL.c">
+      <Filter>platform\gl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\Color.h">
@@ -158,6 +164,12 @@
       <Filter>platform\gl</Filter>
     </ClInclude>
     <ClInclude Include="platform\gl\WindowBackendGL.h">
+      <Filter>platform\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\gl\MeshGL.h">
+      <Filter>platform\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\gl\CommonGL.h">
       <Filter>platform\gl</Filter>
     </ClInclude>
   </ItemGroup>

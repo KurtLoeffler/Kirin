@@ -1,4 +1,4 @@
-#include "platform/WindowBackendGL.h"
+#include "platform/gl/WindowBackendGL.h"
 
 #include "common/CString.h"
 #include "platform/Window.h"

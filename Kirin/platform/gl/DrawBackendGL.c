@@ -3,7 +3,9 @@
 #include "common/Space.h"
 #include "common/CString.h"
 #include "platform/Draw.h"
+#include "platform/gl/CommonGL.h"
 #include "platform/gl/DrawBackendShaderGL.h"
+#include "platform/gl/MeshGL.h"
 
 #include "thirdparty/glad/glad.h"
 
@@ -118,76 +120,6 @@ static void FreeVertexBuffer(VertexBuffer* vertexBuffer)
 	{
 		glDeleteBuffers(1, &vertexBuffer->internalHandle);
 		vertexBuffer->internalHandle = 0;
-	}
-}
-
-static void InitMesh(Mesh* mesh)
-{
-	glGenVertexArrays(1, &mesh->internalHandle);
-	CheckGLError();
-}
-
-static void ApplyMeshStructure(Mesh* mesh)
-{
-	static int32 typeToGLType[] = {
-		[VertexFormatType_Float] = GL_FLOAT,
-		[VertexFormatType_Byte] = GL_UNSIGNED_BYTE,
-	};
-	static_assert(VertexFormatType_Count == 3, "enum has changed.");
-
-#if CONFIG_DEBUG
-	if (mesh->internalHandle == 0)
-	{
-		Error("mesh internalHandle is 0.");
-	}
-#endif
-
-	glBindVertexArray(mesh->internalHandle);
-
-	int32 lastBoundBuffer = 0;
-	for (int32 i = 0; i < mesh->vertexFormatCount; i++)
-	{
-		VertexFormatItem* item = &mesh->vertexFormat[i];
-#if CONFIG_DEBUG
-		if (item->bufferIndex < 0 || item->bufferIndex >= mesh->vertexBufferCount)
-		{
-			ErrorF("VertexFormatItem bufferIndex is out of range. bufferIndex: %d vertexBufferCount: %d", item->bufferIndex, mesh->vertexBufferCount);
-		}
-#endif
-		VertexBuffer* vertexBuffer = &mesh->vertexBuffers[item->bufferIndex];
-
-#if CONFIG_DEBUG
-		if (vertexBuffer->internalHandle == 0)
-		{
-			Error("vertexBuffer internalHandle is 0.");
-		}
-#endif
-		// bind the the formats associated vertex buffer.
-		if (lastBoundBuffer != vertexBuffer->internalHandle)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->internalHandle);
-			CheckGLError();
-		}
-
-		// configure vertex buffer with vertex format.
-		glVertexAttribPointer(i, item->componentCount, typeToGLType[item->type], GL_FALSE, item->stride, (void*)(size_t)item->offset);
-		CheckGLError();
-
-		// enable vertex attribute layout location.
-		glEnableVertexAttribArray(i);
-		CheckGLError();
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
-static void FreeMesh(Mesh* mesh)
-{
-	if (mesh->internalHandle)
-	{
-		glDeleteVertexArrays(1, &mesh->internalHandle);
-		mesh->internalHandle = 0;
 	}
 }
 
@@ -407,9 +339,9 @@ DrawBackend drawBackendGL = {
 	.initVertexBuffer = InitVertexBuffer,
 	.updateVertexBufferData = UpdateVertexBufferData,
 	.freeVertexBuffer = FreeVertexBuffer,
-	.initMesh = InitMesh,
-	.applyMeshStructure = ApplyMeshStructure,
-	.freeMesh = FreeMesh,
+	.initMesh = MeshGL_Init,
+	.applyMeshStructure = MeshGL_ApplyStructure,
+	.freeMesh = MeshGL_Free,
 	.setGeoType = SetGeoType,
 	.setPolygonFillMode = SetPolygonFillMode,
 	.setBlendMode = SetBlendMode,
@@ -429,48 +361,3 @@ DrawBackend* DrawBackendGL_Get()
 {
 	return &drawBackendGL;
 }
-
-#if CONFIG_DEBUG
-static const char* GetGLErrorString(uint32 err)
-{
-	switch (err)
-	{
-	case GL_NO_ERROR:
-		return "GL_NO_ERROR";
-	case GL_INVALID_ENUM:
-		return "GL_INVALID_ENUM";
-	case GL_INVALID_VALUE:
-		return "GL_INVALID_VALUE";
-	case GL_INVALID_OPERATION:
-		return "GL_INVALID_OPERATION";
-	case GL_STACK_OVERFLOW:
-		return "GL_STACK_OVERFLOW";
-	case GL_STACK_UNDERFLOW:
-		return "GL_STACK_UNDERFLOW";
-	case GL_OUT_OF_MEMORY:
-		return "GL_OUT_OF_MEMORY";
-	case GL_INVALID_FRAMEBUFFER_OPERATION:
-		return "GL_INVALID_FRAMEBUFFER_OPERATION";
-	case GL_CONTEXT_LOST:
-		return "GL_CONTEXT_LOST";
-	default:
-		return null;
-	}
-}
-
-bool _CheckGLErrorPrintError(char* file, int line)
-{
-	GLenum error;
-	bool hadAny = false;
-	while ((error = glGetError()) != GL_NO_ERROR)
-	{
-		PrintF("gl error: %s\n", GetGLErrorString(error));
-		hadAny = true;
-	}
-	if (hadAny)
-	{
-		PrintF("    found at %s:%d\n", file, line);
-	}
-	return hadAny;
-}
-#endif

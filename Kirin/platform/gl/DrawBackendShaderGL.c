@@ -1,7 +1,8 @@
-#include "platform/DrawBackendShaderGL.h"
+#include "platform/gl/DrawBackendShaderGL.h"
 
 #include "common/File.h"
-#include "platform/DrawBackendGL.h"
+#include "platform/gl/DrawBackendGL.h"
+#include "platform/gl/CommonGL.h"
 
 #include "thirdparty/glad/glad.h"
 
