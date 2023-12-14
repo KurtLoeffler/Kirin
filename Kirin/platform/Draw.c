@@ -1,5 +1,7 @@
 #include "platform/Draw.h"
 
+#include "platform/Mesh.h"
+
 DrawBackend* currentBackend;
 
 DrawState lastDrawState;
@@ -48,6 +50,11 @@ bool Draw_LoadShader(const char* path, Shader* shader)
 void Draw_FreeShader(Shader* shader)
 {
 	currentBackend->freeShader(shader);
+}
+
+DrawBackend* Draw_GetBackend()
+{
+	return currentBackend;
 }
 
 DrawState* Draw_GetDrawState()
@@ -265,43 +272,4 @@ void Draw_ClearStencil(int32 value)
 {
 	Draw_Flush();
 	currentBackend->clearStencil(value);
-}
-
-void VertexBuffer_Init(VertexBuffer* self, int32 sizeInBytes, VertexBufferUsage usage)
-{
-	*self = (VertexBuffer){ 0 };
-	self->sizeInBytes = sizeInBytes;
-
-	currentBackend->initVertexBuffer(self, usage);
-}
-
-void VertexBuffer_SetData(VertexBuffer* self, int32 offset, int32 size, void* data)
-{
-	currentBackend->updateVertexBufferData(self, offset, size, data);
-}
-
-void VertexBuffer_Free(VertexBuffer* self)
-{
-	currentBackend->freeVertexBuffer(self);
-}
-
-void Mesh_Init(Mesh* self)
-{
-	*self = (Mesh){ 0 };
-
-	currentBackend->initMesh(self);
-}
-
-void Mesh_ApplyStructure(Mesh* self)
-{
-	currentBackend->applyMeshStructure(self);
-}
-
-void Mesh_Free(Mesh* self)
-{
-	for (int32 i = 0; i < self->vertexBufferCount; i++)
-	{
-		VertexBuffer_Free(&self->vertexBuffers[i]);
-	}
-	currentBackend->freeMesh(self);
 }

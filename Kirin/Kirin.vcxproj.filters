@@ -80,6 +80,9 @@
     <ClCompile Include="common\BinWriter.c">
       <Filter>common</Filter>
     </ClCompile>
+    <ClCompile Include="platform\Mesh.c">
+      <Filter>platform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\Color.h">
@@ -150,6 +153,9 @@
     </ClInclude>
     <ClInclude Include="common\BinWriter.h">
       <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\Mesh.h">
+      <Filter>platform</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

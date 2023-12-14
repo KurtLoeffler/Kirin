@@ -216,6 +216,7 @@
     <ClCompile Include="platform\DrawBackendGL.c" />
     <ClCompile Include="platform\Draw.c" />
     <ClCompile Include="platform\DrawBackendShaderGL.c" />
+    <ClCompile Include="platform\Mesh.c" />
     <ClCompile Include="platform\Shader.c" />
     <ClCompile Include="platform\WindowBackendGL.c" />
     <ClCompile Include="platform\SDL2Input.c" />
@@ -239,6 +240,7 @@
     <ClInclude Include="platform\DrawBackendGL.h" />
     <ClInclude Include="platform\Draw.h" />
     <ClInclude Include="platform\DrawBackendShaderGL.h" />
+    <ClInclude Include="platform\Mesh.h" />
     <ClInclude Include="platform\Shader.h" />
     <ClInclude Include="platform\WindowBackend.h" />
     <ClInclude Include="platform\WindowBackendGL.h" />
