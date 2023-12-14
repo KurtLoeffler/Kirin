@@ -1,4 +1,4 @@
-#include "platform/gl/DrawBackendShaderGL.h"
+#include "platform/gl/ShaderGL.h"
 
 #include "common/File.h"
 #include "platform/gl/DrawBackendGL.h"
@@ -64,7 +64,7 @@ static bool CheckShaderProgram(GLuint program, char* prefix)
 	return success;
 }
 
-bool DrawBackendShaderGL_Load(const char* vertPath, const char* fragPath, const char* vertPrefix, const char* fragPrefix, char** outVertStr, char** outFragStr)
+bool ShaderGL_Load(const char* vertPath, const char* fragPath, const char* vertPrefix, const char* fragPrefix, char** outVertStr, char** outFragStr)
 {
 	*outVertStr = null;
 	*outFragStr = null;
@@ -100,7 +100,7 @@ bool DrawBackendShaderGL_Load(const char* vertPath, const char* fragPath, const 
 	return true;
 }
 
-bool DrawBackendShaderGL_Compile(const char* vertStr, const char* fragStr, const char* vertName, const char* fragName, Shader* shader)
+bool ShaderGL_Compile(const char* vertStr, const char* fragStr, const char* vertName, const char* fragName, Shader* shader)
 {
 	// Compile vertex shader
 
@@ -216,7 +216,7 @@ bool DrawBackendShaderGL_Compile(const char* vertStr, const char* fragStr, const
 	return true;
 }
 
-void DrawBackendShaderGL_Free(Shader* self)
+void ShaderGL_Free(Shader* self)
 {
 	if (self->program)
 	{

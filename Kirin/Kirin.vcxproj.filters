@@ -80,7 +80,7 @@
     <ClCompile Include="platform\gl\DrawBackendGL.c">
       <Filter>platform\gl</Filter>
     </ClCompile>
-    <ClCompile Include="platform\gl\DrawBackendShaderGL.c">
+    <ClCompile Include="platform\gl\ShaderGL.c">
       <Filter>platform\gl</Filter>
     </ClCompile>
     <ClCompile Include="platform\gl\WindowBackendGL.c">
@@ -160,7 +160,7 @@
     <ClInclude Include="platform\gl\DrawBackendGL.h">
       <Filter>platform\gl</Filter>
     </ClInclude>
-    <ClInclude Include="platform\gl\DrawBackendShaderGL.h">
+    <ClInclude Include="platform\gl\ShaderGL.h">
       <Filter>platform\gl</Filter>
     </ClInclude>
     <ClInclude Include="platform\gl\WindowBackendGL.h">

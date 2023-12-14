@@ -4,7 +4,7 @@
 #include "common/CString.h"
 #include "platform/Draw.h"
 #include "platform/gl/CommonGL.h"
-#include "platform/gl/DrawBackendShaderGL.h"
+#include "platform/gl/ShaderGL.h"
 #include "platform/gl/MeshGL.h"
 
 #include "thirdparty/glad/glad.h"
@@ -68,9 +68,9 @@ static bool LoadShader(const char* path, Shader* shader)
 
 	char* vertSource;
 	char* fragSource;
-	if (DrawBackendShaderGL_Load(vertPath, fragPath, prefix, prefix, &vertSource, &fragSource))
+	if (ShaderGL_Load(vertPath, fragPath, prefix, prefix, &vertSource, &fragSource))
 	{
-		if (DrawBackendShaderGL_Compile(vertSource, fragSource, vertPath, fragPath, shader))
+		if (ShaderGL_Compile(vertSource, fragSource, vertPath, fragPath, shader))
 		{
 			return true;
 		}
@@ -334,7 +334,7 @@ DrawBackend drawBackendGL = {
 	.init = Init,
 	.free = Free,
 	.loadShader = LoadShader,
-	.freeShader = DrawBackendShaderGL_Free,
+	.freeShader = ShaderGL_Free,
 	.setShader = SetShader,
 	.initVertexBuffer = InitVertexBuffer,
 	.updateVertexBufferData = UpdateVertexBufferData,
