@@ -8,5 +8,5 @@ typedef struct WindowBackend
 	void (*updateWindowFlags)(struct Window* window, uint32* flags);
 	void (*createDevice)(struct Window* window);
 	void (*present)(struct Window* window);
-	void (*vsyncChanged)(struct Window* window);
+	void (*vsyncModeChanged)(struct Window* window);
 } WindowBackend;

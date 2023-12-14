@@ -25,6 +25,25 @@ static const char* WindowMode_ToString(WindowMode value)
 	static_assert(WindowMode_Count == 4, "enum has changed.");
 }
 
+typedef enum VSyncMode
+{
+	VSyncMode_Off,
+	VSyncMode_VSync,
+	VSyncMode_AdaptiveVSync,
+	VSyncMode_Count
+} VSyncMode;
+
+static const char* VSyncMode_ToString(VSyncMode value)
+{
+	switch (value) {
+	case VSyncMode_Off: return "VSyncMode_Off"; break;
+	case VSyncMode_VSync: return "VSyncMode_VSync"; break;
+	case VSyncMode_AdaptiveVSync: return "VSyncMode_AdaptiveVSync"; break;
+	default: return "INVALID"; break;
+	}
+	static_assert(VSyncMode_Count == 3, "enum has changed.");
+}
+
 typedef struct Window
 {
 	WindowBackend* backend;
@@ -33,7 +52,7 @@ typedef struct Window
 	int32 exclusiveFullscreenWidth;
 	int32 exclusiveFullscreenHeight;
 	bool closeRequested;
-	bool vSync;
+	VSyncMode vSyncMode;
 	WindowMode windowMode;
 	bool cursorVisible;
 	void* internalHandle;
@@ -46,8 +65,8 @@ void Window_Init(Window* self, WindowBackend* backend, const char* title, int32 
 void Window_Free(Window* self);
 void Window_Present(Window* self);
 void Window_ProcessEvents(Window* self);
-bool Window_GetVSync(Window* self);
-void Window_SetVSync(Window* self, int32 value);
+VSyncMode Window_GetVSyncMode(Window* self);
+void Window_SetVSyncMode(Window* self, VSyncMode value);
 WindowMode Window_GetWindowMode(Window* self);
 void Window_SetWindowMode(Window* self, WindowMode windowMode);
 IVec2 Window_GetSizeInPixels(Window* self);

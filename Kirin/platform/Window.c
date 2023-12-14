@@ -16,7 +16,7 @@ void Window_Init(Window* self, WindowBackend* backend, const char* title, int32 
 	self->backend = backend;
 	self->windowWidth = width;
 	self->windowHeight = height;
-	self->vSync = true;
+	self->vSyncMode = VSyncMode_AdaptiveVSync;
 	self->windowMode = WindowMode_Window;
 	self->cursorVisible = true;
 
@@ -70,7 +70,7 @@ void Window_Init(Window* self, WindowBackend* backend, const char* title, int32 
 
 	backend->createDevice(self);
 
-	Window_SetVSync(self, Window_GetVSync(self));
+	Window_SetVSyncMode(self, Window_GetVSyncMode(self));
 }
 
 void Window_Free(Window* self)
@@ -148,15 +148,15 @@ void Window_ProcessEvents(Window* self)
 	}
 }
 
-bool Window_GetVSync(Window* self)
+VSyncMode Window_GetVSyncMode(Window* self)
 {
-	return self->vSync;
+	return self->vSyncMode;
 }
 
-void Window_SetVSync(Window* self, int32 value)
+void Window_SetVSyncMode(Window* self, VSyncMode value)
 {
-	self->vSync = value ? 1 : 0;
-	self->backend->vsyncChanged(self);
+	self->vSyncMode = value ? 1 : 0;
+	self->backend->vsyncModeChanged(self);
 }
 
 WindowMode Window_GetWindowMode(Window* self)

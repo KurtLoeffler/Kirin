@@ -84,12 +84,15 @@ static void Present(Window* window)
 	SDL_GL_SwapWindow(sdlWindow);
 }
 
-static void VSyncChanged(Window* window)
+static void VSyncModeChanged(Window* window)
 {
-	if (window->vSync)
+	if (window->vSyncMode == VSyncMode_Off)
 	{
-		const bool allowAdaptiveVSync = true;
-		if (allowAdaptiveVSync)
+		SDL_GL_SetSwapInterval(0);
+	}
+	else
+	{
+		if (window->vSyncMode == VSyncMode_AdaptiveVSync)
 		{
 			// first try adaptive vsync.
 			if (SDL_GL_SetSwapInterval(-1) < 0)
@@ -103,10 +106,6 @@ static void VSyncChanged(Window* window)
 			SDL_GL_SetSwapInterval(1);
 		}
 	}
-	else
-	{
-		SDL_GL_SetSwapInterval(0);
-	}
 }
 
 WindowBackend windowBackendGL = {
@@ -114,7 +113,7 @@ WindowBackend windowBackendGL = {
 	.updateWindowFlags = UpdateWindowFlags,
 	.createDevice = CreateDevice,
 	.present = Present,
-	.vsyncChanged = VSyncChanged,
+	.vsyncModeChanged = VSyncModeChanged,
 };
 
 WindowBackend* WindowBackendGL_Get()
