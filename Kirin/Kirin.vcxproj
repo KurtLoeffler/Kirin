@@ -213,8 +213,10 @@
     <ClCompile Include="common\Standard.c" />
     <ClCompile Include="common\Time.c" />
     <ClCompile Include="common\View.c" />
+    <ClCompile Include="platform\ConstantBuffer.c" />
     <ClCompile Include="platform\Draw.c" />
     <ClCompile Include="platform\gl\CommonGL.c" />
+    <ClCompile Include="platform\gl\ConstantBufferGL.c" />
     <ClCompile Include="platform\gl\DrawBackendGL.c" />
     <ClCompile Include="platform\gl\ShaderGL.c" />
     <ClCompile Include="platform\gl\MeshGL.c" />
@@ -238,9 +240,11 @@
     <ClInclude Include="common\Standard.h" />
     <ClInclude Include="common\Time.h" />
     <ClInclude Include="common\View.h" />
+    <ClInclude Include="platform\ConstantBuffer.h" />
     <ClInclude Include="platform\DrawBackend.h" />
     <ClInclude Include="platform\Draw.h" />
     <ClInclude Include="platform\gl\CommonGL.h" />
+    <ClInclude Include="platform\gl\ConstantBufferGL.h" />
     <ClInclude Include="platform\gl\DrawBackendGL.h" />
     <ClInclude Include="platform\gl\ShaderGL.h" />
     <ClInclude Include="platform\gl\MeshGL.h" />

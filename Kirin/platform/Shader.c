@@ -15,6 +15,12 @@ int32 Shader_FindAttributeIndex(Shader* self, char* name)
 	return -1;
 }
 
+ShaderAttribute* Shader_FindAttribute(Shader* self, char* name)
+{
+	int32 index = Shader_FindAttributeIndex(self, name);
+	return index >= 0 ? &self->attributes[index] : null;
+}
+
 int32 Shader_FindUniformIndex(Shader* self, char* name)
 {
 	for (int i = 0; i < self->uniformCount; i++)
@@ -28,6 +34,12 @@ int32 Shader_FindUniformIndex(Shader* self, char* name)
 	return -1;
 }
 
+ShaderUniform* Shader_FindUniform(Shader* self, char* name)
+{
+	int32 index = Shader_FindUniformIndex(self, name);
+	return index >= 0 ? &self->uniforms[index] : null;
+}
+
 int32 Shader_FindConstantBufferIndex(Shader* self, char* name)
 {
 	for (int i = 0; i < self->constantBufferCount; i++)
@@ -39,4 +51,10 @@ int32 Shader_FindConstantBufferIndex(Shader* self, char* name)
 		}
 	}
 	return -1;
+}
+
+ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name)
+{
+	int32 index = Shader_FindConstantBufferIndex(self, name);
+	return index >= 0 ? &self->constantBuffers[index] : null;
 }
