@@ -6,23 +6,12 @@
 #include "platform/gl/CommonGL.h"
 #include "platform/gl/ShaderGL.h"
 #include "platform/gl/MeshGL.h"
+#include "platform/gl/ConstantBufferGL.h"
 
 #include "thirdparty/glad/glad.h"
 
-static uint32 viewDataUBO;
-typedef struct ViewData
-{
-	Matrix4 viewMatrix;
-	Matrix4 projectionMatrix;
-} ViewData;
-
-static bool viewDataIsDirty;
-static ViewData viewData;
-
 static void Init()
 {
-	viewDataIsDirty = true;
-
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CW);
@@ -30,26 +19,11 @@ static void Init()
 	glDisable(GL_DEPTH_TEST);
 	glDepthFunc(GL_ALWAYS);
 	glDepthMask(GL_FALSE);
-
-	glGenBuffers(1, &viewDataUBO);
-	glBindBuffer(GL_UNIFORM_BUFFER, viewDataUBO);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(ViewData), NULL, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	// bind viewDataUBO to UBO binding point 0.
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, viewDataUBO);
-	CheckGLError();
 }
 
 static void Free()
 {
-	if (viewDataUBO)
-	{
-		glDeleteBuffers(1, &viewDataUBO);
-		viewDataUBO = 0;
-	}
 
-	CheckGLError();
 }
 
 static bool LoadShader(const char* path, Shader* shader)
@@ -260,33 +234,6 @@ static void SetDepthWrite(DrawState* drawState)
 	CheckGLError();
 }
 
-static void SetViewMatrix(const Matrix4* matrix)
-{
-	MemCpy(&viewData.viewMatrix, matrix, sizeof(Matrix4));
-	viewDataIsDirty = true;
-}
-
-static void SetProjectionMatrix(const Matrix4* matrix)
-{
-	MemCpy(&viewData.projectionMatrix, matrix, sizeof(Matrix4));
-	viewDataIsDirty = true;
-}
-
-static void UploadViewDataIfDirty()
-{
-	// shader should aready be set.
-
-	if (viewDataIsDirty)
-	{
-		glBindBuffer(GL_UNIFORM_BUFFER, viewDataUBO);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ViewData), &viewData);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		CheckGLError();
-
-		viewDataIsDirty = false;
-	}
-}
-
 static void SetViewport(int32 x, int32 y, int32 width, int32 height)
 {
 	glViewport(x, y, width, height);
@@ -316,8 +263,6 @@ static void ClearStencil(int32 value)
 
 static void DrawMesh(Mesh* mesh, int32 vertexOffset, int32 vertexCount)
 {
-	UploadViewDataIfDirty();
-
 	glBindVertexArray(mesh->internalHandle);
 	CheckGLError();
 
@@ -348,13 +293,15 @@ DrawBackend drawBackendGL = {
 	.setCullMode = SetCullMode,
 	.setDepthTestMode = SetDepthTestMode,
 	.setDepthWrite = SetDepthWrite,
-	.setViewMatrix = SetViewMatrix,
-	.setProjectionMatrix = SetProjectionMatrix,
 	.setViewport = SetViewport,
 	.clearColor = ClearColor,
 	.clearDepth = ClearDepth,
 	.clearStencil = ClearStencil,
 	.drawMesh = DrawMesh,
+	.constantBufferInit = ConstantBufferGL_Init,
+	.constantBufferAttachToShader = ConstantBufferGL_AttachToShader,
+	.constantBufferSetData = ConstantBufferGL_SetData,
+	.constantBufferFree = ConstantBufferGL_Free,
 };
 
 DrawBackend* DrawBackendGL_Get()

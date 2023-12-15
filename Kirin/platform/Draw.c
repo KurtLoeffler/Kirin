@@ -236,18 +236,6 @@ void Draw_SubmitImmediatePoly(const void* vertices, int32 vertexCount)
 	}
 }
 
-void Draw_SetViewMatrix(const Matrix4* matrix)
-{
-	Draw_Flush();
-	currentBackend->setViewMatrix(matrix);
-}
-
-void Draw_SetProjectionMatrix(const Matrix4* matrix)
-{
-	Draw_Flush();
-	currentBackend->setProjectionMatrix(matrix);
-}
-
 void Draw_SetViewport(int32 x, int32 y, int32 width, int32 height)
 {
 	Draw_Flush();

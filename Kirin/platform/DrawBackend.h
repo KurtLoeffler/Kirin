@@ -148,8 +148,6 @@ typedef struct DrawBackend
 	void (*setCullMode)(DrawState* drawState);
 	void (*setDepthTestMode)(DrawState* drawState);
 	void (*setDepthWrite)(DrawState* drawState);
-	void (*setViewMatrix)(const Matrix4* matrix);
-	void (*setProjectionMatrix)(const Matrix4* matrix);
 	void (*setViewport)(int32 x, int32 y, int32 width, int32 height);
 	void (*clearColor)(float r, float g, float b, float a);
 	void (*clearDepth)(float value);
