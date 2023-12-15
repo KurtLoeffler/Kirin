@@ -10,6 +10,7 @@ void ConstantBufferGL_Init(ConstantBuffer* self, int64 size)
 	glBindBuffer(GL_UNIFORM_BUFFER, self->internalHandle);
 	glBufferData(GL_UNIFORM_BUFFER, (size_t)size, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	CheckGLError();
 }
 
 void ConstantBufferGL_AttachToShader(ConstantBuffer* self, Shader* shader, ShaderConstantBuffer* constantBuffer)

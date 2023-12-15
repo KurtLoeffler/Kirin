@@ -26,6 +26,7 @@ void MeshGL_ApplyStructure(Mesh* self)
 #endif
 
 	glBindVertexArray(self->internalHandle);
+	CheckGLError();
 
 	int32 lastBoundBuffer = 0;
 	for (int32 i = 0; i < self->vertexFormatCount; i++)
@@ -63,6 +64,7 @@ void MeshGL_ApplyStructure(Mesh* self)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	CheckGLError();
 }
 
 void MeshGL_Free(Mesh* self)
@@ -70,6 +72,7 @@ void MeshGL_Free(Mesh* self)
 	if (self->internalHandle)
 	{
 		glDeleteVertexArrays(1, &self->internalHandle);
+		CheckGLError();
 		self->internalHandle = 0;
 	}
 }
