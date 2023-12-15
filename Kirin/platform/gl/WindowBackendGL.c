@@ -7,6 +7,13 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 
+#if PLATFORM_WINDOWS
+#include <windows.h>
+#include <dwmapi.h>
+// DwmFlush
+#pragma comment(lib, "dwmapi")
+#endif
+
 #include "thirdparty/glad/glad.h"
 
 
@@ -74,25 +81,15 @@ static void CreateDevice(Window* window)
 	window->nativeDevice = context;
 }
 
-static void Present(Window* window)
+static void ApplyVSync(VSyncMode mode)
 {
-	SDL_Window* sdlWindow = (SDL_Window*)window->internalHandle;
-
-	IVec2 windowSize = Window_GetSizeInPixels(window);
-	glViewport(0, 0, windowSize.x, windowSize.y);
-
-	SDL_GL_SwapWindow(sdlWindow);
-}
-
-static void VSyncModeChanged(Window* window)
-{
-	if (window->vSyncMode == VSyncMode_Off)
+	if (mode == VSyncMode_Off)
 	{
 		SDL_GL_SetSwapInterval(0);
 	}
 	else
 	{
-		if (window->vSyncMode == VSyncMode_AdaptiveVSync)
+		if (mode == VSyncMode_AdaptiveVSync)
 		{
 			// first try adaptive vsync.
 			if (SDL_GL_SetSwapInterval(-1) < 0)
@@ -106,6 +103,44 @@ static void VSyncModeChanged(Window* window)
 			SDL_GL_SetSwapInterval(1);
 		}
 	}
+}
+
+static void Present(Window* window)
+{
+	SDL_Window* sdlWindow = (SDL_Window*)window->internalHandle;
+
+	IVec2 windowSize = Window_GetSizeInPixels(window);
+	glViewport(0, 0, windowSize.x, windowSize.y);
+
+#if PLATFORM_WINDOWS
+	{
+		bool needsVSyncSet = true;
+		if (window->vSyncMode != VSyncMode_Off && window->windowMode == WindowMode_Window)
+		{
+			// hack to avoid stuttering in windowed mode on windows.
+			bool compositionEnabled = false;
+			if (SUCCEEDED(DwmIsCompositionEnabled(&compositionEnabled)) && compositionEnabled)
+			{
+				needsVSyncSet = false;
+				ApplyVSync(VSyncMode_Off);
+				DwmFlush();
+			}
+		}
+		if (needsVSyncSet)
+		{
+			ApplyVSync(window->vSyncMode);
+		}
+	}
+#else
+	ApplyVSync(window->vSyncMode);
+#endif
+
+	SDL_GL_SwapWindow(sdlWindow);
+}
+
+static void VSyncModeChanged(Window* window)
+{
+	// vsync gets applied in Present now.
 }
 
 WindowBackend windowBackendGL = {
