@@ -1,7 +1,5 @@
 #include "platform/Draw.h"
 
-#include "platform/Mesh.h"
-
 DrawBackend* currentBackend;
 
 DrawState lastDrawState;
