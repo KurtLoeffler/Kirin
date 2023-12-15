@@ -3,15 +3,6 @@
 
 #include "common/Standard.h"
 
-#define ShaderUniform_MaxName 64
-typedef struct ShaderUniform
-{
-	char name[ShaderUniform_MaxName];
-	int32 location;
-	uint32 type;
-	uint32 length;
-} ShaderUniform;
-
 #define ShaderAttribute_MaxName 64
 typedef struct ShaderAttribute
 {
@@ -21,8 +12,26 @@ typedef struct ShaderAttribute
 	uint32 length;
 } ShaderAttribute;
 
+#define ShaderUniform_MaxName 64
+typedef struct ShaderUniform
+{
+	char name[ShaderUniform_MaxName];
+	int32 location;
+	uint32 type;
+	uint32 length;
+} ShaderUniform;
+
+#define ShaderConstantBuffer_MaxName 64
+typedef struct ShaderConstantBuffer
+{
+	char name[ShaderConstantBuffer_MaxName];
+	int32 index;
+	int32 bindingPoint;
+} ShaderConstantBuffer;
+
 #define Shader_MaxAttributes 32
 #define Shader_MaxUniforms 64
+#define Shader_MaxConstantBuffers 16
 typedef struct Shader
 {
 	uint32 program;
@@ -30,6 +39,8 @@ typedef struct Shader
 	ShaderAttribute attributes[Shader_MaxAttributes];
 	int32 uniformCount;
 	ShaderUniform uniforms[Shader_MaxUniforms];
+	int32 constantBufferCount;
+	ShaderConstantBuffer constantBuffers[Shader_MaxConstantBuffers];
 } Shader;
 
 int32 Shader_FindAttributeIndex(Shader* self, char* name);

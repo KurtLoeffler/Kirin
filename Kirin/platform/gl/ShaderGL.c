@@ -206,10 +206,49 @@ bool ShaderGL_Compile(const char* vertStr, const char* fragStr, const char* vert
 			uniform.location = glGetUniformLocation(program, uniform.name);
 			CheckGLError();
 
+			// ignore uniforms in uniform blocks.
+			if (uniform.location < 0)
+			{
+				continue;
+			}
+
 			PrintF("        layout(location = %d) uniform (%d) %s [%d];\n", uniform.location, uniform.type, uniform.name, uniform.length);
 
 			shader->uniforms[i] = uniform;
 			shader->uniformCount++;
+		}
+
+		PrintF("    uniform buffers:\n");
+
+		int32 uniformBufferCount;
+		glGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &uniformBufferCount);
+		CheckGLError();
+
+		for (int32 i = 0; i < uniformBufferCount; i++)
+		{
+			if (shader->constantBufferCount >= Shader_MaxConstantBuffers)
+			{
+				Warning("too many shader uniform buffers.");
+				break;
+			}
+
+			ShaderConstantBuffer constantBuffer = { 0 };
+
+			int32 nameLength;
+			glGetActiveUniformBlockName(program, i, ShaderConstantBuffer_MaxName, &nameLength, constantBuffer.name);
+			CheckGLError();
+
+			// should be equal to i?
+			int32 index = glGetUniformBlockIndex(program, constantBuffer.name);
+			CheckGLError();
+
+			glGetActiveUniformBlockiv(program, index, GL_UNIFORM_BLOCK_BINDING, &constantBuffer.bindingPoint);
+			CheckGLError();
+
+			PrintF("        layout(binding = %d) uniform buffer %s;\n", constantBuffer.bindingPoint, constantBuffer.name);
+
+			shader->constantBuffers[i] = constantBuffer;
+			shader->constantBufferCount++;
 		}
 	}
 
