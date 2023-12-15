@@ -1,12 +1,12 @@
-#include "platform/gl/DrawBackendGL.h"
+#include "draw/gl/DrawBackendGL.h"
 
 #include "common/Space.h"
 #include "common/CString.h"
-#include "platform/Draw.h"
-#include "platform/gl/CommonGL.h"
-#include "platform/gl/ShaderGL.h"
-#include "platform/gl/MeshGL.h"
-#include "platform/gl/ConstantBufferGL.h"
+#include "draw/Draw.h"
+#include "draw/gl/CommonGL.h"
+#include "draw/gl/ShaderGL.h"
+#include "draw/gl/MeshGL.h"
+#include "draw/gl/ConstantBufferGL.h"
 
 #include "thirdparty/glad/glad.h"
 

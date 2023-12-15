@@ -1,6 +1,6 @@
-#include "platform/Mesh.h"
+#include "draw/Mesh.h"
 
-#include "platform/Draw.h"
+#include "draw/Draw.h"
 
 void VertexBuffer_Init(VertexBuffer* self, int32 sizeInBytes, VertexBufferUsage usage)
 {

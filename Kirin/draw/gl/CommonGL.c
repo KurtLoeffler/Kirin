@@ -1,4 +1,4 @@
-#include "platform/gl/CommonGL.h"
+#include "draw/gl/CommonGL.h"
 
 #include "thirdparty/glad/glad.h"
 

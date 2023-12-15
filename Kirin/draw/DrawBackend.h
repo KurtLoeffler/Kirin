@@ -2,9 +2,9 @@
 
 #include "common/Standard.h"
 #include "common/Space.h"
-#include "platform/Mesh.h"
-#include "platform/Shader.h"
-#include "platform/ConstantBuffer.h"
+#include "draw/Mesh.h"
+#include "draw/Shader.h"
+#include "draw/ConstantBuffer.h"
 
 typedef enum DrawGeoType {
 	DrawGeoType_None,

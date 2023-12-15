@@ -1,6 +1,6 @@
-#include "platform/ConstantBuffer.h"
+#include "draw/ConstantBuffer.h"
 
-#include "platform/Draw.h"
+#include "draw/Draw.h"
 
 void ConstantBuffer_Init(ConstantBuffer* self, int64 size)
 {

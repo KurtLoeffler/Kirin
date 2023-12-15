@@ -1,6 +1,6 @@
-#include "platform/gl/MeshGL.h"
+#include "draw/gl/MeshGL.h"
 
-#include "platform/gl/CommonGL.h"
+#include "draw/gl/CommonGL.h"
 
 #include "thirdparty/glad/glad.h"
 

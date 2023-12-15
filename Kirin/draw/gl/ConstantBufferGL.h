@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/Standard.h"
-#include "platform/ConstantBuffer.h"
+#include "draw/ConstantBuffer.h"
 
 void ConstantBufferGL_Init(ConstantBuffer* self, int64 size);
 void ConstantBufferGL_AttachToShader(ConstantBuffer* self, Shader* shader, ShaderConstantBuffer* constantBuffer);
