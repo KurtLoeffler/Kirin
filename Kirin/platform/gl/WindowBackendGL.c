@@ -8,6 +8,7 @@
 #include "SDL_syswm.h"
 
 #if PLATFORM_WINDOWS
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <dwmapi.h>
 // DwmFlush
