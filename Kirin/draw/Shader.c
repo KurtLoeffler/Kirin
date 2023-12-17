@@ -58,3 +58,8 @@ ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name)
 	int32 index = Shader_FindConstantBufferIndex(self, name);
 	return index >= 0 ? &self->constantBuffers[index] : null;
 }
+
+void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform)
+{
+
+}

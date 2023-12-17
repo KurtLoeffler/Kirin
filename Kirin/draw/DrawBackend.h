@@ -134,9 +134,6 @@ typedef struct DrawBackend
 {
 	void (*init)();
 	void (*free)();
-	bool (*loadShader)(const char* path, Shader* shader);
-	void (*freeShader)(Shader* shader);
-	void (*setShader)(DrawState* drawState);
 	void (*initVertexBuffer)(VertexBuffer* vertexBuffer, VertexBufferUsage usage);
 	void (*updateVertexBufferData)(VertexBuffer* vertexBuffer, int32 offset, int32 size, void* data);
 	void (*freeVertexBuffer)(VertexBuffer* vertexBuffer);
@@ -154,6 +151,9 @@ typedef struct DrawBackend
 	void (*clearDepth)(float value);
 	void (*clearStencil)(int32 value);
 	void (*drawMesh)(Mesh* mesh, int32 vertexOffset, int32 vertexCount);
+	bool (*shaderLoad)(const char* path, Shader* shader);
+	void (*shaderFree)(Shader* shader);
+	void (*shaderSet)(DrawState* drawState);
 	void (*constantBufferInit)(ConstantBuffer* self, int64 size);
 	void (*constantBufferAttachToShader)(ConstantBuffer* self, Shader* shader, ShaderConstantBuffer* constantBuffer);
 	void (*constantBufferSetData)(ConstantBuffer* self, int64 offset, int64 length, void* data);

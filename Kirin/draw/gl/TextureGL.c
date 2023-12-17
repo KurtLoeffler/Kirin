@@ -4,6 +4,9 @@
 
 #include "thirdparty/glad/glad.h"
 
+#define TextureGLHandle(self) ((self)->internalHandle[0])
+#define TextureGLBindlessHandle(self) (*((uint64*)&(self)->internalHandle[1]))
+
 static GLint TextureFormatToGLInternalFormat(TextureFormat format)
 {
 	switch (format)
@@ -57,16 +60,16 @@ void TextureGL_Init(Texture* self, TextureInitSettings* initSettings)
 {
 	self->type = initSettings->type;
 	self->format = initSettings->format;
-	self->wrapMode = initSettings->wrapMode ? initSettings->wrapMode : (initSettings->type == TextureType_FrameBuffer ? TextureWrapMode_Clamp : TextureWrapMode_Repeat);
-	self->filterMode = initSettings->filterMode ? initSettings->filterMode : TextureFilterMode_Linear;
+	self->wrapMode = initSettings->wrapMode;
+	self->filterMode = initSettings->filterMode;
 	self->width = initSettings->width;
 	self->height = initSettings->height;
 	self->depth = initSettings->depth;
 
-	glGenTextures(1, &self->internalHandle[0]);
+	glGenTextures(1, &TextureGLHandle(self));
 	if (self->type == TextureType_2D)
 	{
-		glBindTexture(GL_TEXTURE_2D, self->internalHandle[0]);
+		glBindTexture(GL_TEXTURE_2D, TextureGLHandle(self));
 		glTexImage2D(GL_TEXTURE_2D, 0, TextureFormatToGLInternalFormat(self->format), self->width, self->height, 0, TextureFormatToGLFormat(self->format), TextureFormatToGLPixelType(self->format), NULL);
 	}
 	else
@@ -119,9 +122,8 @@ void TextureGL_Init(Texture* self, TextureInitSettings* initSettings)
 	const bool useBindlessTexture = false;
 	if (useBindlessTexture)
 	{
-		uint64* bindlessHandle = (uint64*)&self->internalHandle[1];
-		*bindlessHandle = glGetTextureHandleARB(self->internalHandle[0]);
-		glMakeTextureHandleResidentARB(*bindlessHandle);
+		TextureGLBindlessHandle(self) = glGetTextureHandleARB(TextureGLHandle(self));
+		glMakeTextureHandleResidentARB(TextureGLBindlessHandle(self));
 		CheckGLError();
 	}
 
@@ -131,15 +133,14 @@ void TextureGL_Init(Texture* self, TextureInitSettings* initSettings)
 
 void TextureGL_Free(Texture* self)
 {
-	if (self->internalHandle[0])
+	if (TextureGLHandle(self))
 	{
 		const bool useBindlessTexture = false;
 		if (useBindlessTexture)
 		{
-			uint64* bindlessHandle = (uint64*)&self->internalHandle[1];
-			glMakeTextureHandleNonResidentARB(*bindlessHandle);
+			glMakeTextureHandleNonResidentARB(TextureGLBindlessHandle(self));
 		}
-		glDeleteTextures(1, &self->internalHandle[0]);
+		glDeleteTextures(1, &TextureGLHandle(self));
 		CheckGLError();
 		MemSet(self->internalHandle, 0, sizeof(self->internalHandle));
 	}
@@ -147,7 +148,7 @@ void TextureGL_Free(Texture* self)
 
 void TextureGL_SetData(Texture* self, int32 x, int32 y, int32 width, int32 height, void* data)
 {
-	if (!self->internalHandle[0])
+	if (!TextureGLHandle(self))
 	{
 		Error("texture is not created.");
 	}
@@ -157,7 +158,7 @@ void TextureGL_SetData(Texture* self, int32 x, int32 y, int32 width, int32 heigh
 	width = width >= 0 ? width : self->width;
 	height = height >= 0 ? height : self->height;
 
-	glBindTexture(GL_TEXTURE_2D, self->internalHandle[0]);
+	glBindTexture(GL_TEXTURE_2D, TextureGLHandle(self));
 	CheckGLError();
 	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, TextureFormatToGLFormat(self->format), TextureFormatToGLPixelType(self->format), data);
 	CheckGLError();

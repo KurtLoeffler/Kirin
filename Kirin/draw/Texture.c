@@ -6,7 +6,17 @@ void Texture_Init(Texture* self, TextureInitSettings* initSettings)
 {
 	MemSet(self, 0, sizeof(Texture));
 
-	Draw_GetBackend()->textureInit(self, initSettings);
+	TextureInitSettings newSettings = *initSettings;
+	if (!newSettings.wrapMode)
+	{
+		newSettings.wrapMode = TextureWrapMode_Repeat;
+	}
+	if (!newSettings.filterMode)
+	{
+		newSettings.filterMode = TextureFilterMode_Linear;
+	}
+
+	Draw_GetBackend()->textureInit(self, &newSettings);
 }
 
 void Texture_Free(Texture* self)

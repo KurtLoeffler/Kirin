@@ -49,3 +49,4 @@ int32 Shader_FindConstantBufferIndex(Shader* self, char* name);
 ShaderAttribute* Shader_FindAttribute(Shader* self, char* name);
 ShaderUniform* Shader_FindUniform(Shader* self, char* name);
 ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name);
+void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform);

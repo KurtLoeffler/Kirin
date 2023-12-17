@@ -42,12 +42,12 @@ bool Draw_LoadShader(const char* path, Shader* shader)
 	*shader = (Shader){ 0 };
 
 	PrintF("loading shader \"%s\"\n", path);
-	return currentBackend->loadShader(path, shader);
+	return currentBackend->shaderLoad(path, shader);
 }
 
 void Draw_FreeShader(Shader* shader)
 {
-	currentBackend->freeShader(shader);
+	currentBackend->shaderFree(shader);
 }
 
 DrawBackend* Draw_GetBackend()
@@ -110,7 +110,7 @@ void Draw_CommitDrawState()
 	{
 		if (lastDrawState.dirty || currentDrawState.shader != lastDrawState.shader)
 		{
-			currentBackend->setShader(&currentDrawState);
+			currentBackend->shaderSet(&currentDrawState);
 			lastDrawState.shader = currentDrawState.shader;
 		}
 
