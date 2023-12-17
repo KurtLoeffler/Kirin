@@ -1,11 +1,8 @@
-#include "draw/Texture.h"
+#include "draw/gl/TextureGL.h"
 
 #include "draw/gl/CommonGL.h"
 
 #include "thirdparty/glad/glad.h"
-
-#define TextureGLHandle(self) ((self)->internalHandle[0])
-#define TextureGLBindlessHandle(self) (*((uint64*)&(self)->internalHandle[1]))
 
 static GLint TextureFormatToGLInternalFormat(TextureFormat format)
 {
