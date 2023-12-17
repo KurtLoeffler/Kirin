@@ -7,6 +7,7 @@
 #include "draw/gl/ShaderGL.h"
 #include "draw/gl/MeshGL.h"
 #include "draw/gl/ConstantBufferGL.h"
+#include "draw/gl/TextureGL.h"
 
 #include "thirdparty/glad/glad.h"
 
@@ -302,6 +303,9 @@ DrawBackend drawBackendGL = {
 	.constantBufferAttachToShader = ConstantBufferGL_AttachToShader,
 	.constantBufferSetData = ConstantBufferGL_SetData,
 	.constantBufferFree = ConstantBufferGL_Free,
+	.textureInit = TextureGL_Init,
+	.textureFree = TextureGL_Free,
+	.textureSetData = TextureGL_SetData,
 };
 
 DrawBackend* DrawBackendGL_Get()

@@ -5,6 +5,7 @@
 #include "draw/Mesh.h"
 #include "draw/Shader.h"
 #include "draw/ConstantBuffer.h"
+#include "draw/Texture.h"
 
 typedef enum DrawGeoType {
 	DrawGeoType_None,
@@ -157,4 +158,7 @@ typedef struct DrawBackend
 	void (*constantBufferAttachToShader)(ConstantBuffer* self, Shader* shader, ShaderConstantBuffer* constantBuffer);
 	void (*constantBufferSetData)(ConstantBuffer* self, int64 offset, int64 length, void* data);
 	void (*constantBufferFree)(ConstantBuffer* self);
+	void (*textureInit)(Texture* self, TextureInitSettings* initSettings);
+	void (*textureFree)(Texture* self);
+	void (*textureSetData)(Texture* self, int32 x, int32 y, int32 width, int32 height, void* data);
 } DrawBackend;

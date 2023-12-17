@@ -104,6 +104,12 @@
     <ClCompile Include="draw\gl\CommonGL.c">
       <Filter>draw\gl</Filter>
     </ClCompile>
+    <ClCompile Include="draw\Texture.c">
+      <Filter>draw</Filter>
+    </ClCompile>
+    <ClCompile Include="draw\gl\TextureGL.c">
+      <Filter>draw\gl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\Color.h">
@@ -188,6 +194,12 @@
       <Filter>draw\gl</Filter>
     </ClInclude>
     <ClInclude Include="draw\gl\CommonGL.h">
+      <Filter>draw\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="draw\Texture.h">
+      <Filter>draw</Filter>
+    </ClInclude>
+    <ClInclude Include="draw\gl\TextureGL.h">
       <Filter>draw\gl</Filter>
     </ClInclude>
   </ItemGroup>
