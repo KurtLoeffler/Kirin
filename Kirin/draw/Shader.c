@@ -1,6 +1,7 @@
 #include "draw/Shader.h"
 
 #include "common/CString.h"
+#include "draw/Draw.h"
 
 int32 Shader_FindAttributeIndex(Shader* self, char* name)
 {
@@ -59,7 +60,14 @@ ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name)
 	return index >= 0 ? &self->constantBuffers[index] : null;
 }
 
-void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform)
+void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 value)
 {
+	Draw_Flush();
+	Draw_GetBackend()->shaderSetUniformInt(self, uniform, value);
+}
 
+void Shader_SetUniformTexture(Shader* self, ShaderUniform* uniform, Texture* value)
+{
+	Draw_Flush();
+	Draw_GetBackend()->shaderSetUniformTexture(self, uniform, value);
 }

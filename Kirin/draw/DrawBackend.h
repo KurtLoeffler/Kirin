@@ -154,6 +154,8 @@ typedef struct DrawBackend
 	bool (*shaderLoad)(const char* path, Shader* shader);
 	void (*shaderFree)(Shader* shader);
 	void (*shaderSet)(DrawState* drawState);
+	void (*shaderSetUniformInt)(Shader* self, ShaderUniform* uniform, int32 value);
+	void (*shaderSetUniformTexture)(Shader* self, ShaderUniform* uniform, Texture* value);
 	void (*constantBufferInit)(ConstantBuffer* self, int64 size);
 	void (*constantBufferAttachToShader)(ConstantBuffer* self, Shader* shader, ShaderConstantBuffer* constantBuffer);
 	void (*constantBufferSetData)(ConstantBuffer* self, int64 offset, int64 length, void* data);

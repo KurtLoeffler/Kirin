@@ -2,6 +2,7 @@
 #pragma once
 
 #include "common/Standard.h"
+#include "draw/Texture.h"
 
 #define ShaderAttribute_MaxName 64
 typedef struct ShaderAttribute
@@ -49,4 +50,5 @@ int32 Shader_FindConstantBufferIndex(Shader* self, char* name);
 ShaderAttribute* Shader_FindAttribute(Shader* self, char* name);
 ShaderUniform* Shader_FindUniform(Shader* self, char* name);
 ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name);
-void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform);
+void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 value);
+void Shader_SetUniformTexture(Shader* self, ShaderUniform* uniform, Texture* value);

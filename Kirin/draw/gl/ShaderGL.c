@@ -1,8 +1,9 @@
 #include "draw/gl/ShaderGL.h"
 
 #include "common/File.h"
-#include "draw/gl/DrawBackendGL.h"
 #include "draw/gl/CommonGL.h"
+#include "draw/gl/DrawBackendGL.h"
+#include "draw/gl/TextureGL.h"
 
 #include "thirdparty/glad/glad.h"
 
@@ -263,4 +264,54 @@ void ShaderGL_Free(Shader* self)
 		CheckGLError();
 	}
 	self->program = 0;
+}
+
+void ShaderGL_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 value)
+{
+	// gl 4.1+, otherwise must useProgram and glUniform*.
+	glProgramUniform1i(self->program, uniform->location, value);
+	CheckGLError();
+}
+
+static int32 GetTextureUnitCount()
+{
+	int32 count = -1;
+	if (count < 0)
+	{
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &count);
+		CheckGLError();
+	}
+	return count;
+}
+
+void ShaderGL_SetUniformTexture(Shader* self, ShaderUniform* uniform, Texture* value)
+{
+	// assign texture unit using a rolling index that occupies the top half of the available texture units minus 1.
+	// the highest texture unit is used as a hack to set active so that later glBindTexture calls do not affect unit binding.
+	int32 maxUnits = GetTextureUnitCount();
+	int32 halfUnits = maxUnits/2;
+
+	static int32 rollingIndex = -1;
+	if (rollingIndex < 0)
+	{
+		rollingIndex = halfUnits;
+	}
+
+	glActiveTexture(GL_TEXTURE0+rollingIndex);
+	CheckGLError();
+	glBindTexture(GL_TEXTURE_2D, TextureGLHandle(value));
+	CheckGLError();
+
+	glActiveTexture(GL_TEXTURE0+maxUnits-1);
+	CheckGLError();
+
+	// assign texture unit to texture uniform.
+	ShaderGL_SetUniformInt(self, uniform, rollingIndex);
+
+	rollingIndex++;
+	// minus one because the highest unit is reserved.
+	if (rollingIndex >= maxUnits-1)
+	{
+		rollingIndex = halfUnits;
+	}
 }
