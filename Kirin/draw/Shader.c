@@ -60,14 +60,14 @@ ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name)
 	return index >= 0 ? &self->constantBuffers[index] : null;
 }
 
-void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 value)
+void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayIndex, int32 value)
 {
 	Draw_Flush();
-	Draw_GetBackend()->shaderSetUniformInt(self, uniform, value);
+	Draw_GetBackend()->shaderSetUniformInt(self, uniform, arrayIndex, value);
 }
 
-void Shader_SetUniformTexture(Shader* self, ShaderUniform* uniform, Texture* value)
+void Shader_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arrayIndex, Texture* value)
 {
 	Draw_Flush();
-	Draw_GetBackend()->shaderSetUniformTexture(self, uniform, value);
+	Draw_GetBackend()->shaderSetUniformTexture(self, uniform, arrayIndex, value);
 }

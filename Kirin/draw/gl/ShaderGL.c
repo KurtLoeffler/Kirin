@@ -1,6 +1,7 @@
 #include "draw/gl/ShaderGL.h"
 
 #include "common/File.h"
+#include "common/CString.h"
 #include "draw/gl/CommonGL.h"
 #include "draw/gl/DrawBackendGL.h"
 #include "draw/gl/TextureGL.h"
@@ -172,15 +173,23 @@ bool ShaderGL_Compile(const char* vertStr, const char* fragStr, const char* vert
 			ShaderAttribute attribute = { 0 };
 
 			int32 nameLength;
-			glGetActiveAttrib(program, i, ShaderAttribute_MaxName, &nameLength, &attribute.length, &attribute.type, attribute.name);
+			int32 length;
+			glGetActiveAttrib(program, i, ShaderAttribute_MaxName, &nameLength, &length, &attribute.type, attribute.name);
 			CheckGLError();
+
+			// strip array notation from name.
+			char* stripPos = StrFindChar(attribute.name, '[');
+			if (stripPos)
+			{
+				*stripPos = 0;
+			}
 
 			attribute.location = glGetAttribLocation(program, attribute.name);
 			CheckGLError();
 
-			PrintF("        layout(location = %d) attribute (%d) %s [%d];\n", attribute.location, attribute.type, attribute.name, attribute.length);
+			PrintF("        layout(location = %d) attribute (%d) %s;\n", attribute.location, attribute.type, attribute.name);
 
-			shader->attributes[i] = attribute;
+			shader->attributes[shader->attributeCount] = attribute;
 			shader->attributeCount++;
 		}
 
@@ -201,8 +210,16 @@ bool ShaderGL_Compile(const char* vertStr, const char* fragStr, const char* vert
 			ShaderUniform uniform = { 0 };
 
 			int32 nameLength;
-			glGetActiveUniform(program, i, ShaderUniform_MaxName, &nameLength, &uniform.length, &uniform.type, uniform.name);
+			glGetActiveUniform(program, i, ShaderUniform_MaxName, &nameLength, &uniform.arrayCount, &uniform.type, uniform.name);
 			CheckGLError();
+
+			// strip array notation from name.
+			char* stripPos = StrFindChar(uniform.name, '[');
+			if (stripPos)
+			{
+				uniform.isArray = true;
+				*stripPos = 0;
+			}
 
 			uniform.location = glGetUniformLocation(program, uniform.name);
 			CheckGLError();
@@ -213,9 +230,17 @@ bool ShaderGL_Compile(const char* vertStr, const char* fragStr, const char* vert
 				continue;
 			}
 
-			PrintF("        layout(location = %d) uniform (%d) %s [%d];\n", uniform.location, uniform.type, uniform.name, uniform.length);
+			if (uniform.isArray)
+			{
+				PrintF("        layout(location = %d) uniform (%d) %s[%d];\n", uniform.location, uniform.type, uniform.name, uniform.arrayCount);
+			}
+			else
+			{
+				PrintF("        layout(location = %d) uniform (%d) %s;\n", uniform.location, uniform.type, uniform.name);
+			}
+			
 
-			shader->uniforms[i] = uniform;
+			shader->uniforms[shader->uniformCount] = uniform;
 			shader->uniformCount++;
 		}
 
@@ -239,7 +264,13 @@ bool ShaderGL_Compile(const char* vertStr, const char* fragStr, const char* vert
 			glGetActiveUniformBlockName(program, i, ShaderConstantBuffer_MaxName, &nameLength, constantBuffer.name);
 			CheckGLError();
 
-			// should be equal to i?
+			// strip array notation from name.
+			char* stripPos = StrFindChar(constantBuffer.name, '[');
+			if (stripPos)
+			{
+				*stripPos = 0;
+			}
+
 			int32 index = glGetUniformBlockIndex(program, constantBuffer.name);
 			CheckGLError();
 
@@ -248,7 +279,7 @@ bool ShaderGL_Compile(const char* vertStr, const char* fragStr, const char* vert
 
 			PrintF("        layout(binding = %d) uniform buffer %s;\n", constantBuffer.bindingPoint, constantBuffer.name);
 
-			shader->constantBuffers[i] = constantBuffer;
+			shader->constantBuffers[shader->constantBufferCount] = constantBuffer;
 			shader->constantBufferCount++;
 		}
 	}
@@ -266,10 +297,10 @@ void ShaderGL_Free(Shader* self)
 	self->program = 0;
 }
 
-void ShaderGL_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 value)
+void ShaderGL_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayIndex, int32 value)
 {
 	// gl 4.1+, otherwise must useProgram and glUniform*.
-	glProgramUniform1i(self->program, uniform->location, value);
+	glProgramUniform1i(self->program, uniform->location+arrayIndex, value);
 	CheckGLError();
 }
 
@@ -284,7 +315,7 @@ static int32 GetTextureUnitCount()
 	return count;
 }
 
-void ShaderGL_SetUniformTexture(Shader* self, ShaderUniform* uniform, Texture* value)
+void ShaderGL_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arrayIndex, Texture* value)
 {
 	// assign texture unit using a rolling index that occupies the top half of the available texture units minus 1.
 	// the highest texture unit is used as a hack to set active so that later glBindTexture calls do not affect unit binding.
@@ -306,7 +337,7 @@ void ShaderGL_SetUniformTexture(Shader* self, ShaderUniform* uniform, Texture* v
 	CheckGLError();
 
 	// assign texture unit to texture uniform.
-	ShaderGL_SetUniformInt(self, uniform, rollingIndex);
+	ShaderGL_SetUniformInt(self, uniform, arrayIndex, rollingIndex);
 
 	rollingIndex++;
 	// minus one because the highest unit is reserved.

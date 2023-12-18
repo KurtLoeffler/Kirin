@@ -10,7 +10,6 @@ typedef struct ShaderAttribute
 	char name[ShaderAttribute_MaxName];
 	int32 location;
 	uint32 type;
-	uint32 length;
 } ShaderAttribute;
 
 #define ShaderUniform_MaxName 64
@@ -19,7 +18,8 @@ typedef struct ShaderUniform
 	char name[ShaderUniform_MaxName];
 	int32 location;
 	uint32 type;
-	uint32 length;
+	bool isArray;
+	uint32 arrayCount;
 } ShaderUniform;
 
 #define ShaderConstantBuffer_MaxName 64
@@ -50,5 +50,5 @@ int32 Shader_FindConstantBufferIndex(Shader* self, char* name);
 ShaderAttribute* Shader_FindAttribute(Shader* self, char* name);
 ShaderUniform* Shader_FindUniform(Shader* self, char* name);
 ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name);
-void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 value);
-void Shader_SetUniformTexture(Shader* self, ShaderUniform* uniform, Texture* value);
+void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayIndex, int32 value);
+void Shader_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arrayIndex, Texture* value);
