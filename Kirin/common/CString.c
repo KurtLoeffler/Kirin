@@ -125,6 +125,56 @@ wchar_t* WStrCat(wchar_t* a, const wchar_t* b, int64 count)
 	return count >= 0 ? wcsncat(a, b, (size_t)count) : wcscat(a, b);
 }
 
+char* StrFindChar(const char* str, char c)
+{
+	return strchr(str, c);
+}
+
+wchar_t* WStrFindChar(const wchar_t* str, char c)
+{
+	return wcschr(str, c);
+}
+
+char* StrFindCharReverse(const char* str, char c)
+{
+	return strrchr(str, c);
+}
+
+wchar_t* WStrFindCharReverse(const wchar_t* str, char c)
+{
+	return wcsrchr(str, c);
+}
+
+char* StrFind(char* str, const char* substr)
+{
+	return strstr(str, substr);
+}
+
+wchar_t* WStrFind(wchar_t* str, const wchar_t* substr)
+{
+	return wcsstr(str, substr);
+}
+
+char* StrFindReverse(char* str, const char* substr)
+{
+	char* result = null;
+	while (str = StrFind(str, substr))
+	{
+		result = str;
+	}
+	return result;
+}
+
+wchar_t* WStrFindReverse(wchar_t* str, const wchar_t* substr)
+{
+	wchar_t* result = null;
+	while (str = WStrFind(str, substr))
+	{
+		result = str;
+	}
+	return result;
+}
+
 bool IsSpace(char a)
 {
 	if (a < 0)
