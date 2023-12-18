@@ -42,7 +42,11 @@ bool Draw_LoadShader(const char* path, Shader* shader)
 	*shader = (Shader){ 0 };
 
 	PrintF("loading shader \"%s\"\n", path);
-	return currentBackend->shaderLoad(path, shader);
+	if (!currentBackend->shaderLoad(path, shader))
+	{
+		Error("shader load failed.");
+	}
+	return true;
 }
 
 void Draw_FreeShader(Shader* shader)
