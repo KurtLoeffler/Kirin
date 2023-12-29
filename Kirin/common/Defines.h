@@ -23,7 +23,7 @@
 #if PLATFORM_WINDOWS
 #define _CONSOLE 1
 
-#if VAIN_CONFIG_DEBUG
+#if CONFIG_DEBUG
 #define _DEBUG 1
 #else
 #define NDEBUG 1
