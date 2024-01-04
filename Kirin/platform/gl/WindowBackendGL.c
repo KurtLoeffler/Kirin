@@ -20,7 +20,12 @@
 
 static int32 openGLVersionMajor = 0;
 static int32 openGLVersionMinor = 0;
-static char openGLSLVersionString[16];
+static char openGLSLVersionString[8];
+
+const char* WindowBackendGL_GetGLSLVersionString()
+{
+	return openGLSLVersionString;
+}
 
 static void Init(Window* window)
 {

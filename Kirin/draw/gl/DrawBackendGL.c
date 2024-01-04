@@ -8,6 +8,7 @@
 #include "draw/gl/MeshGL.h"
 #include "draw/gl/ConstantBufferGL.h"
 #include "draw/gl/TextureGL.h"
+#include "platform/gl/WindowBackendGL.h"
 
 #include "thirdparty/glad/glad.h"
 
@@ -32,14 +33,11 @@ static bool LoadShader(const char* path, Shader* shader)
 	char vertPath[MaxPathLength];
 	char fragPath[MaxPathLength];
 
-	StrCpy(vertPath, path, MaxPathLength);
-	StrCat(vertPath, ".vert.glsl", MaxPathLength);
+	SPrintF(vertPath, MaxPathLength, "%s.vert.glsl", path);
+	SPrintF(fragPath, MaxPathLength, "%s.frag.glsl", path);
 
-	StrCpy(fragPath, path, MaxPathLength);
-	StrCat(fragPath, ".frag.glsl", MaxPathLength);
-
-	// TODO: get actual glsl version.
-	char* prefix = "#version 460";
+	char prefix[32];
+	SPrintF(prefix, 32, "#version %s", WindowBackendGL_GetGLSLVersionString());
 
 	char* vertSource;
 	char* fragSource;
