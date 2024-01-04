@@ -79,4 +79,5 @@ void VertexBuffer_SetData(VertexBuffer* self, int32 offset, int32 size, void* da
 void VertexBuffer_Free(VertexBuffer* self);
 void Mesh_Init(Mesh* self);
 void Mesh_ApplyStructure(Mesh* self);
+void Mesh_Draw(Mesh* self, int32 vertexOffset, int32 vertexCount);
 void Mesh_Free(Mesh* self);

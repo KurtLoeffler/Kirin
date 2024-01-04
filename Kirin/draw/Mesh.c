@@ -32,6 +32,12 @@ void Mesh_ApplyStructure(Mesh* self)
 	Draw_GetBackend()->meshApplyStructure(self);
 }
 
+void Mesh_Draw(Mesh* self, int32 vertexOffset, int32 vertexCount)
+{
+	Draw_Flush();
+	Draw_GetBackend()->meshDraw(self, vertexOffset, vertexCount);
+}
+
 void Mesh_Free(Mesh* self)
 {
 	for (int32 i = 0; i < self->vertexBufferCount; i++)
