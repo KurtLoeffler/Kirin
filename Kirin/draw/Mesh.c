@@ -7,29 +7,29 @@ void VertexBuffer_Init(VertexBuffer* self, int32 sizeInBytes, VertexBufferUsage 
 	*self = (VertexBuffer){ 0 };
 	self->sizeInBytes = sizeInBytes;
 
-	Draw_GetBackend()->initVertexBuffer(self, usage);
+	Draw_GetBackend()->vertexBufferInit(self, usage);
 }
 
 void VertexBuffer_SetData(VertexBuffer* self, int32 offset, int32 size, void* data)
 {
-	Draw_GetBackend()->updateVertexBufferData(self, offset, size, data);
+	Draw_GetBackend()->vertexBufferUpdateData(self, offset, size, data);
 }
 
 void VertexBuffer_Free(VertexBuffer* self)
 {
-	Draw_GetBackend()->freeVertexBuffer(self);
+	Draw_GetBackend()->vertexBufferFree(self);
 }
 
 void Mesh_Init(Mesh* self)
 {
 	*self = (Mesh){ 0 };
 
-	Draw_GetBackend()->initMesh(self);
+	Draw_GetBackend()->meshInit(self);
 }
 
 void Mesh_ApplyStructure(Mesh* self)
 {
-	Draw_GetBackend()->applyMeshStructure(self);
+	Draw_GetBackend()->meshApplyStructure(self);
 }
 
 void Mesh_Free(Mesh* self)
@@ -38,5 +38,5 @@ void Mesh_Free(Mesh* self)
 	{
 		VertexBuffer_Free(&self->vertexBuffers[i]);
 	}
-	Draw_GetBackend()->freeMesh(self);
+	Draw_GetBackend()->meshFree(self);
 }

@@ -172,7 +172,7 @@ void Draw_Flush()
 	if (immediateVertexOffset > 0)
 	{
 		VertexBuffer_SetData(&immediateMesh.vertexBuffers[0], 0, immediateVertexOffset, immediateVertexBuffer);
-		currentBackend->drawMesh(&immediateMesh, 0, immediateMesh.vertexCount);
+		currentBackend->meshDraw(&immediateMesh, 0, immediateMesh.vertexCount);
 		immediateMesh.vertexCount = 0;
 		immediateVertexOffset = 0;
 	}

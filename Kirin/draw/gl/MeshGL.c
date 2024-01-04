@@ -4,6 +4,37 @@
 
 #include "thirdparty/glad/glad.h"
 
+void VertexBufferGL_Init(VertexBuffer* self, VertexBufferUsage usage)
+{
+	static int32 usageToGLUsage[] = {
+		[VertexBufferUsage_Static] = GL_STATIC_DRAW,
+		[VertexBufferUsage_Dynamic] = GL_DYNAMIC_DRAW,
+	};
+
+	glGenBuffers(1, &self->internalHandle);
+	glBindBuffer(GL_ARRAY_BUFFER, self->internalHandle);
+	glBufferData(GL_ARRAY_BUFFER, self->sizeInBytes, null, usageToGLUsage[usage]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	CheckGLError();
+}
+
+void VertexBufferGL_UpdateData(VertexBuffer* self, int32 offset, int32 size, void* data)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, self->internalHandle);
+	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	CheckGLError();
+}
+
+void VertexBufferGL_Free(VertexBuffer* self)
+{
+	if (self->internalHandle)
+	{
+		glDeleteBuffers(1, &self->internalHandle);
+		self->internalHandle = 0;
+	}
+}
+
 void MeshGL_Init(Mesh* self)
 {
 	glGenVertexArrays(1, &self->internalHandle);
@@ -64,6 +95,20 @@ void MeshGL_ApplyStructure(Mesh* self)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	CheckGLError();
+}
+
+void MeshGL_Draw(Mesh* self, int32 vertexOffset, int32 vertexCount)
+{
+	glBindVertexArray(self->internalHandle);
+	CheckGLError();
+
+	if (false /*programmable blending*/)
+	{
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+	}
+
+	glDrawArrays(GL_TRIANGLES, vertexOffset, vertexCount);
 	CheckGLError();
 }
 

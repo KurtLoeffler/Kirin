@@ -67,37 +67,6 @@ static void SetShader(DrawState* drawState)
 	CheckGLError();
 }
 
-static void InitVertexBuffer(VertexBuffer* vertexBuffer, VertexBufferUsage usage)
-{
-	static int32 usageToGLUsage[] = {
-		[VertexBufferUsage_Static] = GL_STATIC_DRAW,
-		[VertexBufferUsage_Dynamic] = GL_DYNAMIC_DRAW,
-	};
-
-	glGenBuffers(1, &vertexBuffer->internalHandle);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->internalHandle);
-	glBufferData(GL_ARRAY_BUFFER, vertexBuffer->sizeInBytes, null, usageToGLUsage[usage]);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	CheckGLError();
-}
-
-static void UpdateVertexBufferData(VertexBuffer* vertexBuffer, int32 offset, int32 size, void* data)
-{
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->internalHandle);
-	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	CheckGLError();
-}
-
-static void FreeVertexBuffer(VertexBuffer* vertexBuffer)
-{
-	if (vertexBuffer->internalHandle)
-	{
-		glDeleteBuffers(1, &vertexBuffer->internalHandle);
-		vertexBuffer->internalHandle = 0;
-	}
-}
-
 static void SetGeoType(DrawState* drawState)
 {
 
@@ -262,29 +231,9 @@ static void ClearStencil(int32 value)
 	CheckGLError();
 }
 
-static void DrawMesh(Mesh* mesh, int32 vertexOffset, int32 vertexCount)
-{
-	glBindVertexArray(mesh->internalHandle);
-	CheckGLError();
-
-	if (false /*programmable blending*/)
-	{
-		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-	}
-
-	glDrawArrays(GL_TRIANGLES, vertexOffset, vertexCount);
-	CheckGLError();
-}
-
 DrawBackend drawBackendGL = {
 	.init = Init,
 	.free = Free,
-	.initVertexBuffer = InitVertexBuffer,
-	.updateVertexBufferData = UpdateVertexBufferData,
-	.freeVertexBuffer = FreeVertexBuffer,
-	.initMesh = MeshGL_Init,
-	.applyMeshStructure = MeshGL_ApplyStructure,
-	.freeMesh = MeshGL_Free,
 	.setGeoType = SetGeoType,
 	.setPolygonFillMode = SetPolygonFillMode,
 	.setBlendMode = SetBlendMode,
@@ -295,7 +244,6 @@ DrawBackend drawBackendGL = {
 	.clearColor = ClearColor,
 	.clearDepth = ClearDepth,
 	.clearStencil = ClearStencil,
-	.drawMesh = DrawMesh,
 	.shaderLoad = LoadShader,
 	.shaderFree = ShaderGL_Free,
 	.shaderSet = SetShader,
@@ -308,6 +256,13 @@ DrawBackend drawBackendGL = {
 	.textureInit = TextureGL_Init,
 	.textureFree = TextureGL_Free,
 	.textureSetData = TextureGL_SetData,
+	.vertexBufferInit = VertexBufferGL_Init,
+	.vertexBufferUpdateData = VertexBufferGL_UpdateData,
+	.vertexBufferFree = VertexBufferGL_Free,
+	.meshInit = MeshGL_Init,
+	.meshApplyStructure = MeshGL_ApplyStructure,
+	.meshDraw = MeshGL_Draw,
+	.meshFree = MeshGL_Free,
 };
 
 DrawBackend* DrawBackendGL_Get()

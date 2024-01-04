@@ -134,12 +134,9 @@ typedef struct DrawBackend
 {
 	void (*init)();
 	void (*free)();
-	void (*initVertexBuffer)(VertexBuffer* vertexBuffer, VertexBufferUsage usage);
-	void (*updateVertexBufferData)(VertexBuffer* vertexBuffer, int32 offset, int32 size, void* data);
-	void (*freeVertexBuffer)(VertexBuffer* vertexBuffer);
-	void (*initMesh)(Mesh* mesh);
-	void (*applyMeshStructure)(Mesh* mesh);
-	void (*freeMesh)(Mesh* mesh);
+	void (*vertexBufferInit)(VertexBuffer* vertexBuffer, VertexBufferUsage usage);
+	void (*vertexBufferUpdateData)(VertexBuffer* vertexBuffer, int32 offset, int32 size, void* data);
+	void (*vertexBufferFree)(VertexBuffer* vertexBuffer);
 	void (*setGeoType)(DrawState* drawState);
 	void (*setPolygonFillMode)(DrawState* drawState);
 	void (*setBlendMode)(DrawState* drawState);
@@ -150,7 +147,6 @@ typedef struct DrawBackend
 	void (*clearColor)(float r, float g, float b, float a);
 	void (*clearDepth)(float value);
 	void (*clearStencil)(int32 value);
-	void (*drawMesh)(Mesh* mesh, int32 vertexOffset, int32 vertexCount);
 	bool (*shaderLoad)(const char* path, Shader* shader);
 	void (*shaderFree)(Shader* shader);
 	void (*shaderSet)(DrawState* drawState);
@@ -163,4 +159,8 @@ typedef struct DrawBackend
 	void (*textureInit)(Texture* self, TextureInitSettings* initSettings);
 	void (*textureFree)(Texture* self);
 	void (*textureSetData)(Texture* self, int32 x, int32 y, int32 width, int32 height, void* data);
+	void (*meshInit)(Mesh* mesh);
+	void (*meshApplyStructure)(Mesh* mesh);
+	void (*meshDraw)(Mesh* mesh, int32 vertexOffset, int32 vertexCount);
+	void (*meshFree)(Mesh* mesh);
 } DrawBackend;
