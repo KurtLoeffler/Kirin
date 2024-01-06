@@ -36,6 +36,7 @@ void Mesh_Draw(Mesh* self, int32 vertexOffset, int32 vertexCount)
 {
 	Draw_Flush();
 	Draw_GetBackend()->meshDraw(self, vertexOffset, vertexCount);
+	gDrawStatCounters.meshDraws++;
 }
 
 void Mesh_Free(Mesh* self)

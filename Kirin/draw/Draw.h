@@ -3,6 +3,14 @@
 #include "common/Standard.h"
 #include "draw/DrawBackend.h"
 
+typedef struct DrawStatCounters
+{
+	uint64 immediateDraws;
+	uint64 meshDraws;
+	uint64 granularStateChanges;
+} DrawStatCounters;
+extern DrawStatCounters gDrawStatCounters;
+
 void Draw_Init(DrawBackend* backend);
 void Draw_Free();
 bool Draw_LoadShader(const char* path, Shader* shader);

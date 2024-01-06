@@ -1,5 +1,7 @@
 #include "draw/Draw.h"
 
+DrawStatCounters gDrawStatCounters;
+
 DrawBackend* currentBackend;
 
 DrawState lastDrawState;
@@ -116,42 +118,49 @@ void Draw_CommitDrawState()
 		{
 			currentBackend->shaderSet(&currentDrawState);
 			lastDrawState.shader = currentDrawState.shader;
+			gDrawStatCounters.granularStateChanges++;
 		}
 
 		if (lastDrawState.dirty || currentDrawState.geoType != lastDrawState.geoType)
 		{
 			currentBackend->setGeoType(&currentDrawState);
 			lastDrawState.geoType = currentDrawState.geoType;
+			gDrawStatCounters.granularStateChanges++;
 		}
 
 		if (lastDrawState.dirty || currentDrawState.polygonFillMode != lastDrawState.polygonFillMode)
 		{
 			currentBackend->setPolygonFillMode(&currentDrawState);
 			lastDrawState.polygonFillMode = currentDrawState.polygonFillMode;
+			gDrawStatCounters.granularStateChanges++;
 		}
 
 		if (lastDrawState.dirty || currentDrawState.blendMode != lastDrawState.blendMode)
 		{
 			currentBackend->setBlendMode(&currentDrawState);
 			lastDrawState.blendMode = currentDrawState.blendMode;
+			gDrawStatCounters.granularStateChanges++;
 		}
 
 		if (lastDrawState.dirty || currentDrawState.cullMode != lastDrawState.cullMode)
 		{
 			currentBackend->setCullMode(&currentDrawState);
 			lastDrawState.cullMode = currentDrawState.cullMode;
+			gDrawStatCounters.granularStateChanges++;
 		}
 
 		if (lastDrawState.dirty || currentDrawState.depthTestMode != lastDrawState.depthTestMode)
 		{
 			currentBackend->setDepthTestMode(&currentDrawState);
 			lastDrawState.depthTestMode = currentDrawState.depthTestMode;
+			gDrawStatCounters.granularStateChanges++;
 		}
 
 		if (lastDrawState.dirty || currentDrawState.depthWrite != lastDrawState.depthWrite)
 		{
 			currentBackend->setDepthWrite(&currentDrawState);
 			lastDrawState.depthWrite = currentDrawState.depthWrite;
+			gDrawStatCounters.granularStateChanges++;
 		}
 
 		lastDrawState.dirty = false;
@@ -176,6 +185,8 @@ void Draw_Flush()
 		currentBackend->meshDraw(&immediateMesh, 0, immediateMesh.vertexCount);
 		immediateMesh.vertexCount = 0;
 		immediateVertexOffset = 0;
+		gDrawStatCounters.immediateDraws++;
+		gDrawStatCounters.meshDraws++;
 	}
 
 	Draw_CommitDrawState();
