@@ -22,6 +22,36 @@ static int32 openGLVersionMajor = 0;
 static int32 openGLVersionMinor = 0;
 static char openGLSLVersionString[8];
 
+void WindowBackendGL_GetGLVersion(int32* outMajor, int32* outMinor)
+{
+	*outMajor = openGLVersionMajor;
+	*outMinor = openGLVersionMinor;
+}
+
+int32 WindowBackendGL_CompareGLVersion(int32 major, int32 minor)
+{
+	if (major < openGLVersionMajor)
+	{
+		return -1;
+	}
+	else if (major > openGLVersionMajor)
+	{
+		return 1;
+	}
+	else
+	{
+		if (minor < openGLVersionMinor)
+		{
+			return -1;
+		}
+		else if (minor > openGLVersionMinor)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
 const char* WindowBackendGL_GetGLSLVersionString()
 {
 	return openGLSLVersionString;
