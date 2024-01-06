@@ -5,6 +5,7 @@
 #include "draw/gl/CommonGL.h"
 #include "draw/gl/DrawBackendGL.h"
 #include "draw/gl/TextureGL.h"
+#include "platform/gl/WindowBackendGL.h"
 
 #include "thirdparty/glad/glad.h"
 
@@ -300,6 +301,10 @@ void ShaderGL_Free(Shader* self)
 void ShaderGL_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayIndex, int32 value)
 {
 	// gl 4.1+, otherwise must useProgram and glUniform*.
+	if (WindowBackendGL_CompareGLVersion(4, 1) > 0)
+	{
+		Error("OpenGL version < 4.1 not supported.")
+	}
 	glProgramUniform1i(self->program, uniform->location+arrayIndex, value);
 	CheckGLError();
 }
@@ -320,15 +325,23 @@ void ShaderGL_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arra
 	// assign texture unit using a rolling index that occupies the top half of the available texture units minus 1.
 	// the highest texture unit is used as a hack to set active so that later glBindTexture calls do not affect unit binding.
 	int32 maxUnits = GetTextureUnitCount();
-	int32 halfUnits = maxUnits/2;
+	int32 maxUsableUnits = maxUnits-1;
 
-	static int32 rollingIndex = -1;
-	if (rollingIndex < 0)
+	// HACK: this is wasteful because it leaves holes where non-texture uniforms exist.
+	int32 textureUnit = uniform->location+arrayIndex;
+
+	if (textureUnit >= maxUsableUnits)
 	{
-		rollingIndex = halfUnits;
+		static bool hasWarned = false;
+		if (!hasWarned)
+		{
+			WarningF("shader uniform attempt to use texture unit beyond usable texture units (%d >= %d).", textureUnit, maxUsableUnits);
+			hasWarned = true;
+		}
+		return;
 	}
 
-	glActiveTexture(GL_TEXTURE0+rollingIndex);
+	glActiveTexture(GL_TEXTURE0+textureUnit);
 	CheckGLError();
 	glBindTexture(GL_TEXTURE_2D, TextureGLHandle(value));
 	CheckGLError();
@@ -337,12 +350,5 @@ void ShaderGL_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arra
 	CheckGLError();
 
 	// assign texture unit to texture uniform.
-	ShaderGL_SetUniformInt(self, uniform, arrayIndex, rollingIndex);
-
-	rollingIndex++;
-	// minus one because the highest unit is reserved.
-	if (rollingIndex >= maxUnits-1)
-	{
-		rollingIndex = halfUnits;
-	}
+	ShaderGL_SetUniformInt(self, uniform, arrayIndex, textureUnit);
 }
