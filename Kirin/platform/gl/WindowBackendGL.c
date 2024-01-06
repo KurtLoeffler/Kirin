@@ -120,8 +120,9 @@ static void Present(Window* window)
 
 #if PLATFORM_WINDOWS
 	{
+		const bool useDwm = false;
 		bool needsVSyncSet = true;
-		if (window->vSyncMode != VSyncMode_Off && window->windowMode == WindowMode_Window)
+		if (useDwm && window->vSyncMode != VSyncMode_Off && window->windowMode == WindowMode_Window)
 		{
 			// hack to avoid stuttering in windowed mode on windows.
 			bool compositionEnabled = false;
