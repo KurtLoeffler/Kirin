@@ -7,6 +7,7 @@ typedef struct DrawStatCounters
 {
 	uint64 immediateDraws;
 	uint64 meshDraws;
+	uint64 shaderChanges;
 	uint64 granularStateChanges;
 } DrawStatCounters;
 extern DrawStatCounters gDrawStatCounters;
@@ -18,7 +19,6 @@ void Draw_FreeShader(Shader* shader);
 DrawBackend* Draw_GetBackend();
 DrawState* Draw_GetDrawState();
 void Draw_SetImmediateVertexFormat(VertexFormatItem* format, int32 count);
-void Draw_CommitDrawState();
 void Draw_Flush();
 void Draw_SubmitImmediatePoly(const void* vertices, int32 vertexCount);
 void Draw_SetViewport(int32 x, int32 y, int32 width, int32 height);

@@ -28,7 +28,7 @@ void Draw_Init(DrawBackend* backend)
 	immediateMesh.vertexBufferCount = 1;
 	VertexBuffer_Init(&immediateMesh.vertexBuffers[0], Draw_ImmediateBatchSize, VertexBufferUsage_Dynamic);
 
-	Draw_CommitDrawState();
+	Draw_Flush();
 }
 
 void Draw_Free()
@@ -110,7 +110,7 @@ void Draw_SetImmediateVertexFormat(VertexFormatItem* format, int32 count)
 	}
 }
 
-void Draw_CommitDrawState()
+static void CommitDrawState()
 {
 	if (lastDrawState.dirty || currentDrawState.dirty)
 	{
@@ -118,6 +118,7 @@ void Draw_CommitDrawState()
 		{
 			currentBackend->shaderSet(&currentDrawState);
 			lastDrawState.shader = currentDrawState.shader;
+			gDrawStatCounters.shaderChanges++;
 			gDrawStatCounters.granularStateChanges++;
 		}
 
@@ -189,7 +190,7 @@ void Draw_Flush()
 		gDrawStatCounters.meshDraws++;
 	}
 
-	Draw_CommitDrawState();
+	CommitDrawState();
 }
 
 void Draw_SubmitImmediatePoly(const void* vertices, int32 vertexCount)
