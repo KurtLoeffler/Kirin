@@ -24,6 +24,8 @@ typedef int bool;
 // including null terminator.
 #define MaxPathLength 260
 
+#define ArrayCountOf(a) (sizeof(a) / sizeof(a[0]))
+
 void* MAlloc(size_t size);
 void* MRealloc(void* block, size_t size);
 void MFree(void* ptr);
