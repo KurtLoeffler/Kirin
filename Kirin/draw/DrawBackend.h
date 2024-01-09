@@ -115,20 +115,21 @@ static const char* DepthTestMode_ToString(DepthTestMode value)
 	static_assert(DepthTestMode_Count == 9, "enum has changed.");
 }
 
+#pragma push_macro("DrawStatePackEnum")
+#undef DrawStatePackEnum
+#define DrawStatePackEnum(type, bits) : bits; static_assert(type##_Count <= 1 << bits, "bitfield cannot fit enum.")
 typedef struct DrawState
 {
-#if 0
-	uint64 bits;
-#endif
-	bool dirty;
+	bool dirty : 1;
+	DrawGeoType geoType DrawStatePackEnum(DrawGeoType, 2);
+	PolygonFillMode polygonFillMode DrawStatePackEnum(PolygonFillMode, 2);
+	BlendMode blendMode DrawStatePackEnum(BlendMode, 3);
+	CullMode cullMode DrawStatePackEnum(CullMode, 2);
+	DepthTestMode depthTestMode DrawStatePackEnum(DepthTestMode, 4);
+	bool depthWrite : 1;
 	struct Shader* shader;
-	DrawGeoType geoType;
-	PolygonFillMode polygonFillMode;
-	BlendMode blendMode;
-	CullMode cullMode;
-	DepthTestMode depthTestMode;
-	bool depthWrite;
 } DrawState;
+#pragma pop_macro("DrawStatePackEnum")
 
 typedef struct DrawBackend
 {
