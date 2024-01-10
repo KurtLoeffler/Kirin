@@ -120,7 +120,6 @@ static const char* DepthTestMode_ToString(DepthTestMode value)
 #define DrawStatePackEnum(type, bits) : bits; static_assert(type##_Count <= 1 << bits, "bitfield cannot fit enum.")
 typedef struct DrawState
 {
-	bool dirty : 1;
 	PolygonFillMode polygonFillMode DrawStatePackEnum(PolygonFillMode, 2);
 	BlendMode blendMode DrawStatePackEnum(BlendMode, 3);
 	CullMode cullMode DrawStatePackEnum(CullMode, 2);

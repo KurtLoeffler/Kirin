@@ -4,8 +4,10 @@ DrawStatCounters gDrawStatCounters;
 
 DrawBackend* currentBackend;
 
-DrawState lastDrawState;
 DrawState currentDrawState;
+DrawState lastDrawState;
+static bool currentDrawStateDirty;
+static bool forceFullStateDirty;
 
 static int32 immediateVertexOffset;
 static int32 immediateVertexStride;
@@ -17,10 +19,10 @@ void Draw_Init(DrawBackend* backend)
 {
 	currentBackend = backend;
 
-	lastDrawState = (DrawState){
-		.dirty = true
-	};
-	currentDrawState = lastDrawState;
+	currentDrawState = (DrawState){ 0 };
+	lastDrawState = currentDrawState;
+	currentDrawStateDirty = true;
+	forceFullStateDirty = true;
 
 	currentBackend->init();
 
@@ -64,6 +66,27 @@ DrawBackend* Draw_GetBackend()
 DrawState* Draw_GetDrawState()
 {
 	return &currentDrawState;
+}
+
+bool Draw_IsDrawStateDirty()
+{
+	return currentDrawStateDirty;
+}
+
+void Draw_MarkDrawStateDirty()
+{
+	currentDrawStateDirty = true;
+}
+
+bool Draw_SetDrawState(const DrawState* drawState)
+{
+	if (MemCmp(drawState, &currentDrawState, sizeof(DrawState)) != 0)
+	{
+		currentDrawStateDirty = true;
+		currentDrawState = *drawState;
+	}
+
+	return false;
 }
 
 void Draw_SetImmediateVertexFormat(VertexFormatItem* format, int32 count)
@@ -112,9 +135,9 @@ void Draw_SetImmediateVertexFormat(VertexFormatItem* format, int32 count)
 
 static void CommitDrawState()
 {
-	if (lastDrawState.dirty || currentDrawState.dirty)
+	if (forceFullStateDirty || currentDrawStateDirty)
 	{
-		if (lastDrawState.dirty || currentDrawState.shader != lastDrawState.shader)
+		if (forceFullStateDirty || currentDrawState.shader != lastDrawState.shader)
 		{
 			currentBackend->shaderSet(&currentDrawState);
 			lastDrawState.shader = currentDrawState.shader;
@@ -122,43 +145,43 @@ static void CommitDrawState()
 			gDrawStatCounters.granularStateChanges++;
 		}
 
-		if (lastDrawState.dirty || currentDrawState.polygonFillMode != lastDrawState.polygonFillMode)
+		if (forceFullStateDirty || currentDrawState.polygonFillMode != lastDrawState.polygonFillMode)
 		{
 			currentBackend->setPolygonFillMode(&currentDrawState);
 			lastDrawState.polygonFillMode = currentDrawState.polygonFillMode;
 			gDrawStatCounters.granularStateChanges++;
 		}
 
-		if (lastDrawState.dirty || currentDrawState.blendMode != lastDrawState.blendMode)
+		if (forceFullStateDirty || currentDrawState.blendMode != lastDrawState.blendMode)
 		{
 			currentBackend->setBlendMode(&currentDrawState);
 			lastDrawState.blendMode = currentDrawState.blendMode;
 			gDrawStatCounters.granularStateChanges++;
 		}
 
-		if (lastDrawState.dirty || currentDrawState.cullMode != lastDrawState.cullMode)
+		if (forceFullStateDirty || currentDrawState.cullMode != lastDrawState.cullMode)
 		{
 			currentBackend->setCullMode(&currentDrawState);
 			lastDrawState.cullMode = currentDrawState.cullMode;
 			gDrawStatCounters.granularStateChanges++;
 		}
 
-		if (lastDrawState.dirty || currentDrawState.depthTestMode != lastDrawState.depthTestMode)
+		if (forceFullStateDirty || currentDrawState.depthTestMode != lastDrawState.depthTestMode)
 		{
 			currentBackend->setDepthTestMode(&currentDrawState);
 			lastDrawState.depthTestMode = currentDrawState.depthTestMode;
 			gDrawStatCounters.granularStateChanges++;
 		}
 
-		if (lastDrawState.dirty || currentDrawState.depthWrite != lastDrawState.depthWrite)
+		if (forceFullStateDirty || currentDrawState.depthWrite != lastDrawState.depthWrite)
 		{
 			currentBackend->setDepthWrite(&currentDrawState);
 			lastDrawState.depthWrite = currentDrawState.depthWrite;
 			gDrawStatCounters.granularStateChanges++;
 		}
 
-		lastDrawState.dirty = false;
-		currentDrawState.dirty = false;
+		forceFullStateDirty = false;
+		currentDrawStateDirty = false;
 
 #if CONFIG_DEBUG
 		if (MemCmp(&currentDrawState, &lastDrawState, sizeof(DrawState)) != 0)
@@ -218,7 +241,7 @@ void Draw_SubmitImmediatePoly(const void* vertices, int32 vertexCount)
 	}
 
 	// if the state is dirty the immediate geometry must be flushed now.
-	if (currentDrawState.dirty || immediateVertexOffset+actualVertexCountSize >= Draw_ImmediateBatchSize)
+	if (currentDrawStateDirty || immediateVertexOffset+actualVertexCountSize >= Draw_ImmediateBatchSize)
 	{
 		Draw_Flush();
 	}
