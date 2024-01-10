@@ -311,7 +311,7 @@ void ShaderGL_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayInd
 
 static int32 GetTextureUnitCount()
 {
-	int32 count = -1;
+	static int32 count = -1;
 	if (count < 0)
 	{
 		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &count);
