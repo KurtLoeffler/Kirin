@@ -122,13 +122,6 @@ static void CommitDrawState()
 			gDrawStatCounters.granularStateChanges++;
 		}
 
-		if (lastDrawState.dirty || currentDrawState.geoType != lastDrawState.geoType)
-		{
-			currentBackend->setGeoType(&currentDrawState);
-			lastDrawState.geoType = currentDrawState.geoType;
-			gDrawStatCounters.granularStateChanges++;
-		}
-
 		if (lastDrawState.dirty || currentDrawState.polygonFillMode != lastDrawState.polygonFillMode)
 		{
 			currentBackend->setPolygonFillMode(&currentDrawState);

@@ -121,7 +121,6 @@ static const char* DepthTestMode_ToString(DepthTestMode value)
 typedef struct DrawState
 {
 	bool dirty : 1;
-	DrawGeoType geoType DrawStatePackEnum(DrawGeoType, 2);
 	PolygonFillMode polygonFillMode DrawStatePackEnum(PolygonFillMode, 2);
 	BlendMode blendMode DrawStatePackEnum(BlendMode, 3);
 	CullMode cullMode DrawStatePackEnum(CullMode, 2);
