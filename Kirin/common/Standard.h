@@ -44,10 +44,10 @@ int32 MemCmp(const void* a, const void* b, size_t size);
 
 bool SPrintF(char* dest, int32 destLength, PrintFormatStringAttribute const char* format, ...);
 char* SPrintFAlloc(PrintFormatStringAttribute const char* format, ...);
-bool WSPrintF(wchar_t* dest, int32 destLength, PrintFormatStringAttribute const wchar_t* format, ...);
-wchar_t* WSPrintFAlloc(PrintFormatStringAttribute const wchar_t* format, ...);
+bool SPrintFW(wchar_t* dest, int32 destLength, PrintFormatStringAttribute const wchar_t* format, ...);
+wchar_t* SPrintFWAlloc(PrintFormatStringAttribute const wchar_t* format, ...);
 int32 SScanF(const char* buffer, ScanFormatStringAttribute const char* format, ...);
-int32 WSScanF(const wchar_t* buffer, ScanFormatStringAttribute const wchar_t* format, ...);
+int32 SScanFW(const wchar_t* buffer, ScanFormatStringAttribute const wchar_t* format, ...);
 void Print(const char* message);
 void PrintLine(const char* message);
 void PrintF(PrintFormatStringAttribute const char* format, ...);

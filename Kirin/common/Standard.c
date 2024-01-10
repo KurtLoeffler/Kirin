@@ -77,7 +77,7 @@ char* SPrintFAlloc(PrintFormatStringAttribute const char* format, ...)
 	return mem;
 }
 
-bool WSPrintF(wchar_t* dest, int32 destLength, PrintFormatStringAttribute const wchar_t* format, ...)
+bool SPrintFW(wchar_t* dest, int32 destLength, PrintFormatStringAttribute const wchar_t* format, ...)
 {
 	va_list args = null;
 	va_start(args, format);
@@ -95,7 +95,7 @@ bool WSPrintF(wchar_t* dest, int32 destLength, PrintFormatStringAttribute const 
 	return true;
 }
 
-wchar_t* WSPrintFAlloc(PrintFormatStringAttribute const wchar_t* format, ...)
+wchar_t* SPrintFWAlloc(PrintFormatStringAttribute const wchar_t* format, ...)
 {
 	va_list args = null;
 	va_start(args, format);
@@ -117,7 +117,7 @@ int32 SScanF(const char* buffer, ScanFormatStringAttribute const char* format, .
 	return result;
 }
 
-int32 WSScanF(const wchar_t* buffer, ScanFormatStringAttribute const wchar_t* format, ...)
+int32 SScanFW(const wchar_t* buffer, ScanFormatStringAttribute const wchar_t* format, ...)
 {
 	va_list args = null;
 	va_start(args, format);
