@@ -161,15 +161,15 @@ bool File_WriteBinaryFileW(const wchar_t* path, const uint8* data, int64 size)
 	return true;
 }
 
-uint8* File_ReadBinaryFile(const char* path, int64* outSize)
+uint8* File_ReadBinaryFileAlloc(const char* path, int64* outSize)
 {
 	wchar_t* wpath = CStringToWideStringAlloc(path, -1);
-	uint8* result = File_ReadBinaryFileW(wpath, outSize);
+	uint8* result = File_ReadBinaryFileWAlloc(wpath, outSize);
 	MFree(wpath);
 	return result;
 }
 
-uint8* File_ReadBinaryFileW(const wchar_t* path, int64* outSize)
+uint8* File_ReadBinaryFileWAlloc(const wchar_t* path, int64* outSize)
 {
 	File file;
 	if (!File_OpenW(&file, path, FileMode_Read))
@@ -211,28 +211,28 @@ static void* ReadCStringFileGeneric(const wchar_t* path, size_t charSize, int64*
 	return data;
 }
 
-char* File_ReadCStringFile(const char* path, int64* outLength)
+char* File_ReadCStringFileAlloc(const char* path, int64* outLength)
 {
 	wchar_t* wpath = CStringToWideStringAlloc(path, -1);
-	char* result = File_ReadCStringFileW(wpath, outLength);
+	char* result = File_ReadCStringFileWAlloc(wpath, outLength);
 	MFree(wpath);
 	return result;
 }
 
-char* File_ReadCStringFileW(const wchar_t* path, int64* outLength)
+char* File_ReadCStringFileWAlloc(const wchar_t* path, int64* outLength)
 {
 	return (char*)ReadCStringFileGeneric(path, sizeof(char), outLength);
 }
 
-wchar_t* File_ReadWideCStringFile(const char* path, int64* outLength)
+wchar_t* File_ReadWideCStringFileAlloc(const char* path, int64* outLength)
 {
 	wchar_t* wpath = CStringToWideStringAlloc(path, -1);
-	wchar_t* result = File_ReadWideCStringFileW(wpath, outLength);
+	wchar_t* result = File_ReadWideCStringFileWAlloc(wpath, outLength);
 	MFree(wpath);
 	return result;
 }
 
-wchar_t* File_ReadWideCStringFileW(const wchar_t* path, int64* outLength)
+wchar_t* File_ReadWideCStringFileWAlloc(const wchar_t* path, int64* outLength)
 {
 	return (wchar_t*)ReadCStringFileGeneric(path, sizeof(wchar_t), outLength);
 }

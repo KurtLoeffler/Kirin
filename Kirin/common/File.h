@@ -48,11 +48,11 @@ void File_Close(File* self);
 bool File_WriteBinaryFile(const char* path, const uint8* data, int64 size);
 bool File_WriteBinaryFileW(const wchar_t* path, const uint8* data, int64 size);
 
-uint8* File_ReadBinaryFile(const char* path, int64* outSize);
-uint8* File_ReadBinaryFileW(const wchar_t* path, int64* outSize);
+uint8* File_ReadBinaryFileAlloc(const char* path, int64* outSize);
+uint8* File_ReadBinaryFileWAlloc(const wchar_t* path, int64* outSize);
 
-char* File_ReadCStringFile(const char* path, int64* outLength);
-char* File_ReadCStringFileW(const wchar_t* path, int64* outLength);
+char* File_ReadCStringFileAlloc(const char* path, int64* outLength);
+char* File_ReadCStringFileWAlloc(const wchar_t* path, int64* outLength);
 
-wchar_t* File_ReadWideCStringFile(const char* path, int64* outLength);
-wchar_t* File_ReadWideCStringFileW(const wchar_t* path, int64* outLength);
+wchar_t* File_ReadWideCStringFileAlloc(const char* path, int64* outLength);
+wchar_t* File_ReadWideCStringFileWAlloc(const wchar_t* path, int64* outLength);

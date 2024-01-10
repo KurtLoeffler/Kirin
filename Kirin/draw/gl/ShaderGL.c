@@ -72,7 +72,7 @@ bool ShaderGL_Load(const char* vertPath, const char* fragPath, const char* vertP
 	*outVertStr = null;
 	*outFragStr = null;
 
-	char* vertStr = File_ReadCStringFile(vertPath, null);
+	char* vertStr = File_ReadCStringFileAlloc(vertPath, null);
 	if (!vertStr)
 	{
 		return false;
@@ -84,7 +84,7 @@ bool ShaderGL_Load(const char* vertPath, const char* fragPath, const char* vertP
 		MFree(oldStr);
 	}
 
-	char* fragStr = File_ReadCStringFile(fragPath, null);
+	char* fragStr = File_ReadCStringFileAlloc(fragPath, null);
 	if (!fragStr)
 	{
 		MFree(vertStr);
