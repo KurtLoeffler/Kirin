@@ -290,3 +290,35 @@ int64 CStringToWideString(wchar_t* dest, int64 destDataLength, const char* sourc
 
 	return convertedCount;
 }
+
+char* WideStringToCStringAlloc(const wchar_t* source, int64 sourceLength)
+{
+	int64 required = WideStringToCString(null, -1, source, sourceLength)+1;
+	char* dest = MAlloc(sizeof(wchar_t)*(size_t)required);
+	WideStringToCString(dest, required, source, sourceLength);
+	return dest;
+}
+
+int64 WideStringToCString(char* dest, int64 destDataLength, const wchar_t* source, int64 sourceLength)
+{
+	if (destDataLength >= 0 && destDataLength < sourceLength+1)
+	{
+		Error("destDataLength is less than sourceLength+1.");
+	}
+
+	size_t convertCount = sourceLength < 0 ? (size_t)-1 : (size_t)sourceLength+1;
+
+	int64 convertedCount = (int64)wcstombs(dest, source, convertCount);
+	if (convertedCount == (size_t)-1)
+	{
+		Error("source had invalid characters.")
+	}
+
+	if (dest)
+	{
+		// always null terminate dest.
+		dest[convertedCount] = 0;
+	}
+
+	return convertedCount;
+}

@@ -39,3 +39,6 @@ wchar_t* CStringToWideStringAlloc(const char* source, int64 sourceLength);
 // sourceLength is the number of characters to convert, or -1.
 // returns the number of copied characters. if dest is null, returns the number of characters that would have been copied (not including null terminator).
 int64 CStringToWideString(wchar_t* dest, int64 destDataLength, const char* source, int64 sourceLength);
+
+char* WideStringToCStringAlloc(const wchar_t* source, int64 sourceLength);
+int64 WideStringToCString(char* dest, int64 destDataLength, const wchar_t* source, int64 sourceLength);
