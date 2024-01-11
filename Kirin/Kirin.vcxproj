@@ -211,6 +211,7 @@
     <ClCompile Include="common\Math.c" />
     <ClCompile Include="common\Space.c" />
     <ClCompile Include="common\Standard.c" />
+    <ClCompile Include="common\Thread.c" />
     <ClCompile Include="common\Time.c" />
     <ClCompile Include="common\View.c" />
     <ClCompile Include="draw\ConstantBuffer.c" />
@@ -240,6 +241,7 @@
     <ClInclude Include="common\Math.h" />
     <ClInclude Include="common\Space.h" />
     <ClInclude Include="common\Standard.h" />
+    <ClInclude Include="common\Thread.h" />
     <ClInclude Include="common\Time.h" />
     <ClInclude Include="common\View.h" />
     <ClInclude Include="draw\ConstantBuffer.h" />

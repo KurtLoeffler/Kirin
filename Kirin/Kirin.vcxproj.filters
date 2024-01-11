@@ -110,6 +110,9 @@
     <ClCompile Include="draw\gl\TextureGL.c">
       <Filter>draw\gl</Filter>
     </ClCompile>
+    <ClCompile Include="common\Thread.c">
+      <Filter>common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\Color.h">
@@ -201,6 +204,9 @@
     </ClInclude>
     <ClInclude Include="draw\gl\TextureGL.h">
       <Filter>draw\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="common\Thread.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
