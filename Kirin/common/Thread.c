@@ -9,7 +9,7 @@ void Mutex_Init(Mutex* self)
     self->internalHandle = CreateMutex(NULL, FALSE, NULL);
     if (!self->internalHandle)
     {
-        Error("failed to create mutex: %d", GetLastError());
+        ErrorF("failed to create mutex: %d", GetLastError());
     }
 }
 
