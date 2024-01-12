@@ -115,6 +115,37 @@ static const char* DepthTestMode_ToString(DepthTestMode value)
 	static_assert(DepthTestMode_Count == 9, "enum has changed.");
 }
 
+typedef enum StencilOpMode
+{
+	StencilOpMode_None,
+	StencilOpMode_Keep,
+	StencilOpMode_Zero,
+	StencilOpMode_Replace,
+	StencilOpMode_Inc,
+	StencilOpMode_IncWrap,
+	StencilOpMode_Dec,
+	StencilOpMode_DecWrap,
+	StencilOpMode_Invert,
+	StencilOpMode_Count,
+} StencilOpMode;
+
+static const char* StencilOpMode_ToString(StencilOpMode value)
+{
+	switch (value) {
+	case StencilOpMode_None: return "StencilOpMode_None"; break;
+	case StencilOpMode_Keep: return "StencilOpMode_Keep"; break;
+	case StencilOpMode_Zero: return "StencilOpMode_Zero"; break;
+	case StencilOpMode_Replace: return "StencilOpMode_Replace"; break;
+	case StencilOpMode_Inc: return "StencilOpMode_Inc"; break;
+	case StencilOpMode_IncWrap: return "StencilOpMode_IncWrap"; break;
+	case StencilOpMode_Dec: return "StencilOpMode_Dec"; break;
+	case StencilOpMode_DecWrap: return "StencilOpMode_DecWrap"; break;
+	case StencilOpMode_Invert: return "StencilOpMode_Invert"; break;
+	default: return "INVALID"; break;
+	}
+	static_assert(StencilOpMode_Count == 9, "enum has changed.");
+}
+
 #pragma push_macro("DrawStatePackEnum")
 #undef DrawStatePackEnum
 #define DrawStatePackEnum(type, bits) : bits; static_assert(type##_Count <= 1 << bits, "bitfield cannot fit enum.")
@@ -125,6 +156,14 @@ typedef struct DrawState
 	CullMode cullMode DrawStatePackEnum(CullMode, 2);
 	DepthTestMode depthTestMode DrawStatePackEnum(DepthTestMode, 4);
 	bool depthWrite : 1;
+	DepthTestMode stencilFunc DrawStatePackEnum(DepthTestMode, 4);
+	StencilOpMode stencilOpFailStencil DrawStatePackEnum(StencilOpMode, 4);
+	StencilOpMode stencilOpFailDepth DrawStatePackEnum(StencilOpMode, 4);
+	StencilOpMode stencilOpPass DrawStatePackEnum(StencilOpMode, 4);
+	uint8 stencilMask;
+	uint8 stencilFuncRef;
+	uint8 stencilFuncMask;
+	// TODO: move shader out of DrawState.
 	struct Shader* shader;
 } DrawState;
 #pragma pop_macro("DrawStatePackEnum")
@@ -142,6 +181,7 @@ typedef struct DrawBackend
 	void (*setCullMode)(DrawState* drawState);
 	void (*setDepthTestMode)(DrawState* drawState);
 	void (*setDepthWrite)(DrawState* drawState);
+	void (*setStencilState)(DrawState* drawState);
 	void (*setViewport)(int32 x, int32 y, int32 width, int32 height);
 	void (*clearColor)(float r, float g, float b, float a);
 	void (*clearDepth)(float value);

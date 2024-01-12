@@ -180,6 +180,27 @@ static void CommitDrawState()
 			gDrawStatCounters.granularStateChanges++;
 		}
 
+		// PERF: is this slow?
+		if (forceFullStateDirty ||
+			currentDrawState.stencilFunc != lastDrawState.stencilFunc ||
+			currentDrawState.stencilOpFailStencil != lastDrawState.stencilOpFailStencil ||
+			currentDrawState.stencilOpFailDepth != lastDrawState.stencilOpFailDepth ||
+			currentDrawState.stencilOpPass != lastDrawState.stencilOpPass ||
+			currentDrawState.stencilMask != lastDrawState.stencilMask ||
+			currentDrawState.stencilFuncRef != lastDrawState.stencilFuncRef ||
+			currentDrawState.stencilFuncMask != lastDrawState.stencilFuncMask)
+		{
+			currentBackend->setStencilState(&currentDrawState);
+			lastDrawState.stencilFunc = currentDrawState.stencilFunc;
+			lastDrawState.stencilOpFailStencil = currentDrawState.stencilOpFailStencil;
+			lastDrawState.stencilOpFailDepth = currentDrawState.stencilOpFailDepth;
+			lastDrawState.stencilOpPass = currentDrawState.stencilOpPass;
+			lastDrawState.stencilMask = currentDrawState.stencilMask;
+			lastDrawState.stencilFuncRef = currentDrawState.stencilFuncRef;
+			lastDrawState.stencilFuncMask = currentDrawState.stencilFuncMask;
+			gDrawStatCounters.granularStateChanges++;
+		}
+
 		forceFullStateDirty = false;
 		currentDrawStateDirty = false;
 

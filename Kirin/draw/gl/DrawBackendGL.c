@@ -83,8 +83,6 @@ static void SetPolygonFillMode(DrawState* drawState)
 	case PolygonFillMode_Point:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		break;
-	default:
-		break;
 	}
 }
 
@@ -149,8 +147,6 @@ static void SetCullMode(DrawState* drawState)
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 		break;
-	default:
-		break;
 	}
 }
 
@@ -189,8 +185,6 @@ static void SetDepthTestMode(DrawState* drawState)
 		case DepthTestMode_GreaterEqual:
 			glDepthFunc(GL_GEQUAL);
 			break;
-		default:
-			break;
 		}
 	}
 	CheckGLError();
@@ -199,6 +193,81 @@ static void SetDepthTestMode(DrawState* drawState)
 static void SetDepthWrite(DrawState* drawState)
 {
 	glDepthMask(drawState->depthWrite);
+	CheckGLError();
+}
+
+
+
+static int32 TranslateStencilOpMode(StencilOpMode mode)
+{
+	switch (mode)
+	{
+	case StencilOpMode_Keep:
+		return GL_KEEP;
+	case StencilOpMode_Zero:
+		return GL_ZERO;
+	case StencilOpMode_Replace:
+		return GL_REPLACE;
+	case StencilOpMode_Inc:
+		return GL_INCR;
+	case StencilOpMode_IncWrap:
+		return GL_INCR_WRAP;
+	case StencilOpMode_Dec:
+		return GL_DECR;
+	case StencilOpMode_DecWrap:
+		return GL_DECR_WRAP;
+	case StencilOpMode_Invert:
+		return GL_INVERT;
+	}
+	return 0;
+}
+
+static void SetStencilWrite(DrawState* drawState)
+{
+	if (drawState->stencilFunc == DepthTestMode_None)
+	{
+		glDisable(GL_STENCIL_TEST);
+	}
+	else
+	{
+		glEnable(GL_STENCIL_TEST);
+		switch (drawState->stencilFunc)
+		{
+		case DepthTestMode_Always:
+			glStencilFunc(GL_ALWAYS, drawState->stencilFuncRef, drawState->stencilFuncMask);
+			break;
+		case DepthTestMode_Never:
+			glStencilFunc(GL_NEVER, drawState->stencilFuncRef, drawState->stencilFuncMask);
+			break;
+		case DepthTestMode_Equal:
+			glStencilFunc(GL_EQUAL, drawState->stencilFuncRef, drawState->stencilFuncMask);
+			break;
+		case DepthTestMode_NotEqual:
+			glStencilFunc(GL_NOTEQUAL, drawState->stencilFuncRef, drawState->stencilFuncMask);
+			break;
+		case DepthTestMode_Less:
+			glStencilFunc(GL_LESS, drawState->stencilFuncRef, drawState->stencilFuncMask);
+			break;
+		case DepthTestMode_LessEqual:
+			glStencilFunc(GL_LEQUAL, drawState->stencilFuncRef, drawState->stencilFuncMask);
+			break;
+		case DepthTestMode_Greater:
+			glStencilFunc(GL_GREATER, drawState->stencilFuncRef, drawState->stencilFuncMask);
+			break;
+		case DepthTestMode_GreaterEqual:
+			glStencilFunc(GL_GEQUAL, drawState->stencilFuncRef, drawState->stencilFuncMask);
+			break;
+		}
+	}
+	CheckGLError();
+
+	glStencilMask(drawState->stencilMask);
+	CheckGLError();
+
+	glStencilOp(
+		TranslateStencilOpMode(drawState->stencilOpFailStencil),
+		TranslateStencilOpMode(drawState->stencilOpFailDepth),
+		TranslateStencilOpMode(drawState->stencilOpPass));
 	CheckGLError();
 }
 
@@ -238,6 +307,7 @@ DrawBackend drawBackendGL = {
 	.setCullMode = SetCullMode,
 	.setDepthTestMode = SetDepthTestMode,
 	.setDepthWrite = SetDepthWrite,
+	.setStencilState = SetStencilWrite,
 	.setViewport = SetViewport,
 	.clearColor = ClearColor,
 	.clearDepth = ClearDepth,
