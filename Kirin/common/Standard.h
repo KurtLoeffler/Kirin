@@ -68,10 +68,26 @@ void ErrorInternal(const char* file, int32 line, const char* message);
 #define Assert(expression) if (!(expression)) { ErrorF("assert failed: (%s)", #expression); }
 #if CONFIG_RELEASE
 // removed from release config.
+#define DevErrorF(format, ...)
+// removed from release config.
+#define DevError(message)
+// removed from release config.
+#define DevWarningF(format, ...)
+// removed from release config.
+#define DevWarning(message)
+// removed from release config.
 #define DevAssertMessage(expression, message)
 // removed from release config.
 #define DevAssert(expression)
 #else
+// removed from release config.
+#define DevErrorF(format, ...) ErrorF(format, __VA_ARGS__)
+// removed from release config.
+#define DevError(message) Error(message)
+// removed from release config.
+#define DevWarningF(format, ...) WarningF(format, __VA_ARGS__)
+// removed from release config.
+#define DevWarning(message) Warning(message)
 // removed from release config.
 #define DevAssertMessage(expression, message) AssertMessage(expression, message)
 // removed from release config.
