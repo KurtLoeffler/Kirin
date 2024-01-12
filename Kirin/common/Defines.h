@@ -4,12 +4,16 @@
 #define CONFIG_DEBUG 0
 #endif
 
+#ifndef CONFIG_RELEASEDEV
+#define CONFIG_RELEASEDEV 0
+#endif
+
 #ifndef CONFIG_RELEASE
 #define CONFIG_RELEASE 0
 #endif
 
-#if CONFIG_DEBUG+CONFIG_RELEASE != 1
-#error exactly one of the following must be defined: CONFIG_DEBUG, CONFIG_RELEASE
+#if CONFIG_DEBUG+CONFIG_RELEASEDEV+CONFIG_RELEASE != 1
+#error exactly one of the following must be defined: CONFIG_DEBUG, CONFIG_RELEASEDEV, CONFIG_RELEASE
 #endif
 
 #ifndef PLATFORM_WINDOWS
