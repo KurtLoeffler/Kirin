@@ -66,20 +66,7 @@ void ErrorInternal(const char* file, int32 line, const char* message);
 #define Warning(message) { ErrorInternal(__FILE__, __LINE__, message); }
 #define AssertMessage(expression, message) if (!(expression)) { ErrorF("assert failed: %s", message); }
 #define Assert(expression) if (!(expression)) { ErrorF("assert failed: (%s)", #expression); }
-#if CONFIG_RELEASE
-// removed from release config.
-#define DevErrorF(format, ...)
-// removed from release config.
-#define DevError(message)
-// removed from release config.
-#define DevWarningF(format, ...)
-// removed from release config.
-#define DevWarning(message)
-// removed from release config.
-#define DevAssertMessage(expression, message)
-// removed from release config.
-#define DevAssert(expression)
-#else
+#if CONFIGTYPE_DEV
 // removed from release config.
 #define DevErrorF(format, ...) ErrorF(format, __VA_ARGS__)
 // removed from release config.
@@ -92,4 +79,17 @@ void ErrorInternal(const char* file, int32 line, const char* message);
 #define DevAssertMessage(expression, message) AssertMessage(expression, message)
 // removed from release config.
 #define DevAssert(expression) Assert(expression)
+#else
+// removed from release config.
+#define DevErrorF(format, ...)
+// removed from release config.
+#define DevError(message)
+// removed from release config.
+#define DevWarningF(format, ...)
+// removed from release config.
+#define DevWarning(message)
+// removed from release config.
+#define DevAssertMessage(expression, message)
+// removed from release config.
+#define DevAssert(expression)
 #endif
