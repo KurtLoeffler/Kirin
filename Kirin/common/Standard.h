@@ -64,3 +64,17 @@ void ErrorInternal(const char* file, int32 line, const char* message);
 #define Error(message) { ErrorInternal(__FILE__, __LINE__, message); ERROR_BREAK; }
 #define WarningF(format, ...) { ErrorFInternal(__FILE__, __LINE__, format, __VA_ARGS__); }
 #define Warning(message) { ErrorInternal(__FILE__, __LINE__, message); }
+#define AssertMessage(expression, message) if (!(expression)) { ErrorF("assert failed: %s", message); }
+#define Assert(expression) if (!(expression)) { ErrorF("assert failed: (%s)", #expression); }
+#define StaticAssert(expression, message) static_assert(expression, message)
+#if CONFIG_RELEASE
+// removed from release config.
+#define DevAssertMessage(expression, message)
+// removed from release config.
+#define DevAssert(expression)
+#else
+// removed from release config.
+#define DevAssertMessage(expression, message) AssertMessage(expression, message)
+// removed from release config.
+#define DevAssert(expression) Assert(expression)
+#endif
