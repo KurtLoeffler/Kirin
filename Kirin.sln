@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kirin", "Kirin\Kirin.vcxproj", "{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kirin", "Kirin\Kirin.vcxproj", "{44511278-0BC4-4951-A13E-CF59FD60CC61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,16 +11,22 @@ Global
 		Debug|x86 = Debug|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
+		ReleaseDev|x64 = ReleaseDev|x64
+		ReleaseDev|x86 = ReleaseDev|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}.Debug|x64.ActiveCfg = Debug|x64
-		{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}.Debug|x64.Build.0 = Debug|x64
-		{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}.Debug|x86.ActiveCfg = Debug|Win32
-		{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}.Debug|x86.Build.0 = Debug|Win32
-		{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}.Release|x64.ActiveCfg = Release|x64
-		{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}.Release|x64.Build.0 = Release|x64
-		{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}.Release|x86.ActiveCfg = Release|Win32
-		{C2BE5DA4-DF63-4F8C-9508-03B5F991153C}.Release|x86.Build.0 = Release|Win32
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.Debug|x64.ActiveCfg = Debug|x64
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.Debug|x64.Build.0 = Debug|x64
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.Debug|x86.ActiveCfg = Debug|Win32
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.Debug|x86.Build.0 = Debug|Win32
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.Release|x64.ActiveCfg = Release|x64
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.Release|x64.Build.0 = Release|x64
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.Release|x86.ActiveCfg = Release|Win32
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.Release|x86.Build.0 = Release|Win32
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.ReleaseDev|x64.ActiveCfg = ReleaseDev|x64
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.ReleaseDev|x64.Build.0 = ReleaseDev|x64
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.ReleaseDev|x86.ActiveCfg = ReleaseDev|Win32
+		{44511278-0BC4-4951-A13E-CF59FD60CC61}.ReleaseDev|x86.Build.0 = ReleaseDev|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
