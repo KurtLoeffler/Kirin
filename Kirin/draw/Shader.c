@@ -62,6 +62,7 @@ ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name)
 
 void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayIndex, int32 value)
 {
+	// PERF: do we only need to flush if this is the current draw shader?
 	Draw_Flush();
 	Draw_GetBackend()->shaderSetUniformInt(self, uniform, arrayIndex, value);
 }

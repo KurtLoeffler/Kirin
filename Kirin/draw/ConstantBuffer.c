@@ -14,10 +14,12 @@ void ConstantBuffer_AttachToShader(ConstantBuffer* self, Shader* shader, ShaderC
 
 void ConstantBuffer_SetData(ConstantBuffer* self, int64 offset, int64 length, void* data)
 {
+	Draw_Flush();
 	Draw_GetBackend()->constantBufferSetData(self, offset, length, data);
 }
 
 void ConstantBuffer_Free(ConstantBuffer* self)
 {
+	Draw_Flush();
 	Draw_GetBackend()->constantBufferFree(self);
 }
