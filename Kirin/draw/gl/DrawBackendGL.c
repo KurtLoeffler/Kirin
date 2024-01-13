@@ -43,7 +43,10 @@ static bool LoadShader(const char* path, Shader* shader)
 	char* fragSource;
 	if (ShaderGL_Load(vertPath, fragPath, prefix, prefix, &vertSource, &fragSource))
 	{
-		if (ShaderGL_Compile(vertSource, fragSource, vertPath, fragPath, shader))
+		bool compileResult = ShaderGL_Compile(vertSource, fragSource, vertPath, fragPath, shader);
+		MFree(vertSource);
+		MFree(fragSource);
+		if (compileResult)
 		{
 			return true;
 		}
