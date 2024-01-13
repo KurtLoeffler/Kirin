@@ -9,6 +9,8 @@ DrawState lastDrawState;
 static bool currentDrawStateDirty;
 static bool forceFullStateDirty;
 
+static Shader* currentShader;
+
 static int32 immediateVertexOffset;
 static int32 immediateVertexStride;
 #define Draw_ImmediateBatchSize 65536
@@ -89,6 +91,24 @@ bool Draw_SetDrawState(const DrawState* drawState)
 	return false;
 }
 
+Shader* Draw_GetShader()
+{
+	return currentShader;
+}
+
+void Draw_SetShader(Shader* shader)
+{
+	if (shader == currentShader)
+	{
+		return;
+	}
+
+	Draw_Flush();
+	currentBackend->shaderSet(shader);
+	currentShader = shader;
+	gDrawStatCounters.shaderChanges++;
+}
+
 void Draw_SetImmediateVertexFormat(VertexFormatItem* format, int32 count)
 {
 	if (count <= 0)
@@ -137,14 +157,6 @@ static void CommitDrawState()
 {
 	if (forceFullStateDirty || currentDrawStateDirty)
 	{
-		if (forceFullStateDirty || currentDrawState.shader != lastDrawState.shader)
-		{
-			currentBackend->shaderSet(&currentDrawState);
-			lastDrawState.shader = currentDrawState.shader;
-			gDrawStatCounters.shaderChanges++;
-			gDrawStatCounters.granularStateChanges++;
-		}
-
 		if (forceFullStateDirty || currentDrawState.polygonFillMode != lastDrawState.polygonFillMode)
 		{
 			currentBackend->setPolygonFillMode(&currentDrawState);
@@ -213,23 +225,6 @@ static void CommitDrawState()
 	}
 }
 
-void Draw_Flush()
-{
-	// draw immediate geometry before applying new state because it must be drawn with the state state from when the geometry was submitted.
-	if (immediateVertexOffset > 0)
-	{
-		VertexBuffer_SetData(&immediateMesh.vertexBuffers[0], 0, immediateVertexOffset, immediateVertexBuffer);
-		// not using Mesh_Draw here because that calls Draw_Flush.
-		currentBackend->meshDraw(&immediateMesh, 0, immediateMesh.vertexCount);
-		immediateMesh.vertexCount = 0;
-		immediateVertexOffset = 0;
-		gDrawStatCounters.immediateDraws++;
-		gDrawStatCounters.meshDraws++;
-	}
-
-	CommitDrawState();
-}
-
 void Draw_SubmitImmediatePoly(const void* vertices, int32 vertexCount)
 {
 #if CONFIG_DEBUG
@@ -288,6 +283,23 @@ void Draw_SubmitImmediatePoly(const void* vertices, int32 vertexCount)
 			immediateVertexOffset += immediateVertexStride*3;
 		}
 	}
+}
+
+void Draw_Flush()
+{
+	// draw immediate geometry before applying new state because it must be drawn with the state state from when the geometry was submitted.
+	if (immediateVertexOffset > 0)
+	{
+		VertexBuffer_SetData(&immediateMesh.vertexBuffers[0], 0, immediateVertexOffset, immediateVertexBuffer);
+		// not using Mesh_Draw here because that calls Draw_Flush.
+		currentBackend->meshDraw(&immediateMesh, 0, immediateMesh.vertexCount);
+		immediateMesh.vertexCount = 0;
+		immediateVertexOffset = 0;
+		gDrawStatCounters.immediateDraws++;
+		gDrawStatCounters.meshDraws++;
+	}
+
+	CommitDrawState();
 }
 
 void Draw_SetViewport(int32 x, int32 y, int32 width, int32 height)

@@ -163,8 +163,6 @@ typedef struct DrawState
 	uint8 stencilMask;
 	uint8 stencilFuncRef;
 	uint8 stencilFuncMask;
-	// TODO: move shader out of DrawState.
-	struct Shader* shader;
 } DrawState;
 #pragma pop_macro("DrawStatePackEnum")
 
@@ -188,7 +186,7 @@ typedef struct DrawBackend
 	void (*clearStencil)(int32 value);
 	bool (*shaderLoad)(const char* path, Shader* shader);
 	void (*shaderFree)(Shader* shader);
-	void (*shaderSet)(DrawState* drawState);
+	void (*shaderSet)(Shader* shader);
 	void (*shaderSetUniformInt)(Shader* self, ShaderUniform* uniform, int32 arrayIndex, int32 value);
 	void (*shaderSetUniformTexture)(Shader* self, ShaderUniform* uniform, int32 arrayIndex, Texture* value);
 	void (*constantBufferInit)(ConstantBuffer* self, int64 size);

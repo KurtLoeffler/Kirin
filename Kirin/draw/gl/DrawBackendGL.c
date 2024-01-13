@@ -52,15 +52,15 @@ static bool LoadShader(const char* path, Shader* shader)
 	return false;
 }
 
-static void SetShader(DrawState* drawState)
+static void SetShader(Shader* shader)
 {
-	if (!drawState->shader)
+	if (!shader)
 	{
 		glUseProgram(0);
 	}
 	else
 	{
-		glUseProgram(drawState->shader->program);
+		glUseProgram(shader->program);
 	}
 	CheckGLError();
 }
