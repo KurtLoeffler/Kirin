@@ -6,7 +6,6 @@
 bool Shader_Load(const char* path, Shader* shader)
 {
 	*shader = (Shader){ 0 };
-	shader->resourceID = Draw_AllocateResourceID();
 
 	PrintF("loading shader \"%s\"\n", path);
 	if (!Draw_GetBackend()->shaderLoad(path, shader))
