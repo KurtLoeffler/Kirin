@@ -117,7 +117,6 @@ static const char* DepthTestMode_ToString(DepthTestMode value)
 
 typedef enum StencilOpMode
 {
-	StencilOpMode_None,
 	StencilOpMode_Keep,
 	StencilOpMode_Zero,
 	StencilOpMode_Replace,
@@ -132,7 +131,6 @@ typedef enum StencilOpMode
 static const char* StencilOpMode_ToString(StencilOpMode value)
 {
 	switch (value) {
-	case StencilOpMode_None: return "StencilOpMode_None"; break;
 	case StencilOpMode_Keep: return "StencilOpMode_Keep"; break;
 	case StencilOpMode_Zero: return "StencilOpMode_Zero"; break;
 	case StencilOpMode_Replace: return "StencilOpMode_Replace"; break;
@@ -143,7 +141,7 @@ static const char* StencilOpMode_ToString(StencilOpMode value)
 	case StencilOpMode_Invert: return "StencilOpMode_Invert"; break;
 	default: return "INVALID"; break;
 	}
-	static_assert(StencilOpMode_Count == 9, "enum has changed.");
+	static_assert(StencilOpMode_Count == 8, "enum has changed.");
 }
 
 #pragma push_macro("DrawStatePackEnum")
@@ -157,9 +155,9 @@ typedef struct DrawState
 	DepthTestMode depthTestMode DrawStatePackEnum(DepthTestMode, 4);
 	bool depthWrite : 1;
 	DepthTestMode stencilFunc DrawStatePackEnum(DepthTestMode, 4);
-	StencilOpMode stencilOpFailStencil DrawStatePackEnum(StencilOpMode, 4);
-	StencilOpMode stencilOpFailDepth DrawStatePackEnum(StencilOpMode, 4);
-	StencilOpMode stencilOpPass DrawStatePackEnum(StencilOpMode, 4);
+	StencilOpMode stencilOpFailStencil DrawStatePackEnum(StencilOpMode, 3);
+	StencilOpMode stencilOpFailDepth DrawStatePackEnum(StencilOpMode, 3);
+	StencilOpMode stencilOpPass DrawStatePackEnum(StencilOpMode, 3);
 	uint8 stencilMask;
 	uint8 stencilFuncRef;
 	uint8 stencilFuncMask;
