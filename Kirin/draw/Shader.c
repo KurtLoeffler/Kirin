@@ -3,6 +3,28 @@
 #include "common/CString.h"
 #include "draw/Draw.h"
 
+bool Shader_Load(const char* path, Shader* shader)
+{
+	*shader = (Shader){ 0 };
+	shader->resourceID = Draw_AllocateResourceID();
+
+	PrintF("loading shader \"%s\"\n", path);
+	if (!Draw_GetBackend()->shaderLoad(path, shader))
+	{
+		Error("shader load failed.");
+	}
+	return true;
+}
+
+void Shader_Free(Shader* shader)
+{
+	if (Draw_GetShader() == shader)
+	{
+		Draw_SetShader(null);
+	}
+	Draw_GetBackend()->shaderFree(shader);
+}
+
 int32 Shader_FindAttributeIndex(Shader* self, char* name)
 {
 	for (int i = 0; i < self->attributeCount; i++)

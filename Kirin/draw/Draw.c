@@ -43,23 +43,6 @@ void Draw_Free()
 	currentBackend = null;
 }
 
-bool Draw_LoadShader(const char* path, Shader* shader)
-{
-	*shader = (Shader){ 0 };
-
-	PrintF("loading shader \"%s\"\n", path);
-	if (!currentBackend->shaderLoad(path, shader))
-	{
-		Error("shader load failed.");
-	}
-	return true;
-}
-
-void Draw_FreeShader(Shader* shader)
-{
-	currentBackend->shaderFree(shader);
-}
-
 DrawBackend* Draw_GetBackend()
 {
 	return currentBackend;

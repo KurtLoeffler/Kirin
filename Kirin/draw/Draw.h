@@ -14,8 +14,6 @@ extern DrawStatCounters gDrawStatCounters;
 
 void Draw_Init(DrawBackend* backend);
 void Draw_Free();
-bool Draw_LoadShader(const char* path, Shader* shader);
-void Draw_FreeShader(Shader* shader);
 DrawBackend* Draw_GetBackend();
 DrawState* Draw_GetDrawState();
 bool Draw_IsDrawStateDirty();

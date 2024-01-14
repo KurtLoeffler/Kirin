@@ -44,6 +44,8 @@ typedef struct Shader
 	ShaderConstantBuffer constantBuffers[Shader_MaxConstantBuffers];
 } Shader;
 
+bool Shader_Load(const char* path, Shader* shader);
+void Shader_Free(Shader* shader);
 int32 Shader_FindAttributeIndex(Shader* self, char* name);
 int32 Shader_FindUniformIndex(Shader* self, char* name);
 int32 Shader_FindConstantBufferIndex(Shader* self, char* name);
