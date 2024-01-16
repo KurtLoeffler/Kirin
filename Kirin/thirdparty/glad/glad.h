@@ -85,7 +85,7 @@ typedef void* (* GLADloadproc)(const char *name);
 GLAPI struct gladGLversionStruct GLVersion;
 GLAPI int gladLoadGLLoader(GLADloadproc);
 
-#include <KHR/khrplatform.h>
+#include "khrplatform.h"
 typedef unsigned int GLenum;
 typedef unsigned char GLboolean;
 typedef unsigned int GLbitfield;
