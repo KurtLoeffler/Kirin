@@ -194,6 +194,7 @@ typedef struct DrawBackend
 	void (*textureInit)(Texture* self, TextureInitSettings* initSettings);
 	void (*textureFree)(Texture* self);
 	void (*textureSetData)(Texture* self, int32 x, int32 y, int32 width, int32 height, void* data);
+	void (*generateMipmaps)(Texture* self);
 	void (*meshInit)(Mesh* mesh);
 	void (*meshApplyStructure)(Mesh* mesh);
 	void (*meshDraw)(Mesh* mesh, int32 vertexOffset, int32 vertexCount);

@@ -322,20 +322,18 @@ static int32 GetTextureUnitCount()
 
 void ShaderGL_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arrayIndex, Texture* value)
 {
-	// assign texture unit using a rolling index that occupies the top half of the available texture units minus 1.
-	// the highest texture unit is used as a hack to set active so that later glBindTexture calls do not affect unit binding.
 	int32 maxUnits = GetTextureUnitCount();
-	int32 maxUsableUnits = maxUnits-1;
 
+	// add 1 because texture unit 0 is reserved for other stuff.
 	// HACK: this is wasteful because it leaves holes where non-texture uniforms exist.
-	int32 textureUnit = uniform->location+arrayIndex;
+	int32 textureUnit = 1+uniform->location+arrayIndex;
 
-	if (textureUnit >= maxUsableUnits)
+	if (textureUnit >= maxUnits)
 	{
 		static bool hasWarned = false;
 		if (!hasWarned)
 		{
-			WarningF("shader uniform attempt to use texture unit beyond usable texture units (%d >= %d).", textureUnit, maxUsableUnits);
+			WarningF("shader uniform attempt to use texture unit beyond usable texture units (%d >= %d).", textureUnit, maxUnits);
 			hasWarned = true;
 		}
 		return;
@@ -346,7 +344,8 @@ void ShaderGL_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arra
 	glBindTexture(GL_TEXTURE_2D, TextureGLHandle(value));
 	CheckGLError();
 
-	glActiveTexture(GL_TEXTURE0+maxUnits-1);
+	// make teture unit 0 active so future texture bindings don't mess up the the texture units.
+	glActiveTexture(GL_TEXTURE0);
 	CheckGLError();
 
 	// assign texture unit to texture uniform.

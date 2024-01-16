@@ -52,6 +52,47 @@ static GLint TextureFormatToGLPixelType(TextureFormat format)
 	return 0;
 }
 
+static void UpdateFiltering(Texture* self)
+{
+	uint32 minFilter;
+	uint32 magFilter;
+	switch (self->filterMode)
+	{
+	case TextureFilterMode_Nearest:
+		minFilter = GL_NEAREST;
+		magFilter = GL_NEAREST;
+		break;
+	case TextureFilterMode_Linear:
+		minFilter = GL_LINEAR;
+		magFilter = GL_LINEAR;
+		break;
+	default:
+		Error("invalid texture wrap mode.");
+		break;
+	}
+
+	if (self->hasMipmaps)
+	{
+		if (self->mipFilterMode > TextureMipFilterMode_Nearest)
+		{
+			minFilter = minFilter == GL_NEAREST ? GL_NEAREST_MIPMAP_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
+		}
+		else
+		{
+			minFilter = minFilter == GL_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR_MIPMAP_NEAREST;
+		}
+	}
+
+	glBindTexture(GL_TEXTURE_2D, TextureGLHandle(self));
+	CheckGLError();
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+	CheckGLError();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	CheckGLError();
+}
 
 void TextureGL_Init(Texture* self, TextureInitSettings* initSettings)
 {
@@ -59,6 +100,7 @@ void TextureGL_Init(Texture* self, TextureInitSettings* initSettings)
 	self->format = initSettings->format;
 	self->wrapMode = initSettings->wrapMode;
 	self->filterMode = initSettings->filterMode;
+	self->mipFilterMode = initSettings->mipFilterMode;
 	self->width = initSettings->width;
 	self->height = initSettings->height;
 	self->depth = initSettings->depth;
@@ -95,27 +137,6 @@ void TextureGL_Init(Texture* self, TextureInitSettings* initSettings)
 		CheckGLError();
 	}
 
-	{
-		uint32 filterParam;
-		switch (self->filterMode)
-		{
-		case TextureFilterMode_Nearest:
-			filterParam = GL_NEAREST;
-			break;
-		case TextureFilterMode_Linear:
-			filterParam = GL_LINEAR;
-			break;
-		default:
-			Error("invalid texture wrap mode.");
-			break;
-		}
-
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterParam);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterParam);
-		CheckGLError();
-	}
-
 	const bool useBindlessTexture = false;
 	if (useBindlessTexture)
 	{
@@ -123,6 +144,8 @@ void TextureGL_Init(Texture* self, TextureInitSettings* initSettings)
 		glMakeTextureHandleResidentARB(TextureGLBindlessHandle(self));
 		CheckGLError();
 	}
+
+	UpdateFiltering(self);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	CheckGLError();
@@ -162,4 +185,23 @@ void TextureGL_SetData(Texture* self, int32 x, int32 y, int32 width, int32 heigh
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	CheckGLError();
+}
+
+void TextureGL_GenerateMipmaps(Texture* self)
+{
+	glBindTexture(GL_TEXTURE_2D, TextureGLHandle(self));
+	CheckGLError();
+
+	bool didHaveMipmaps = self->hasMipmaps;
+	self->hasMipmaps = true;
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	CheckGLError();
+
+	if (self->hasMipmaps != didHaveMipmaps)
+	{
+		UpdateFiltering(self);
+	}
 }

@@ -327,6 +327,7 @@ DrawBackend drawBackendGL = {
 	.textureInit = TextureGL_Init,
 	.textureFree = TextureGL_Free,
 	.textureSetData = TextureGL_SetData,
+	.generateMipmaps = TextureGL_GenerateMipmaps,
 	.vertexBufferInit = VertexBufferGL_Init,
 	.vertexBufferUpdateData = VertexBufferGL_UpdateData,
 	.vertexBufferFree = VertexBufferGL_Free,
