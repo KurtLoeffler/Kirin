@@ -83,27 +83,6 @@ static const char* TextureFilterMode_ToString(TextureFilterMode value)
 	static_assert(TextureFilterMode_Count == 3, "enum has changed.");
 }
 
-typedef enum TextureMipFilterMode
-{
-	TextureMipFilterMode_None,
-	TextureMipFilterMode_Nearest,
-	TextureMipFilterMode_Linear,
-	TextureMipFilterMode_Anisotropic,
-	TextureMipFilterMode_Count,
-} TextureMipFilterMode;
-
-static const char* TextureMipFilterMode_ToString(TextureMipFilterMode value)
-{
-	switch (value) {
-	case TextureMipFilterMode_None: return "TextureMipFilterMode_None"; break;
-	case TextureMipFilterMode_Nearest: return "TextureMipFilterMode_Nearest"; break;
-	case TextureMipFilterMode_Linear: return "TextureMipFilterMode_Linear"; break;
-	case TextureMipFilterMode_Anisotropic: return "TextureMipFilterMode_Anisotropic"; break;
-	default: return "INVALID"; break;
-	}
-	static_assert(TextureMipFilterMode_Count == 4, "enum has changed.");
-}
-
 typedef struct TextureInitSettings
 {
 	TextureType type;
@@ -111,6 +90,8 @@ typedef struct TextureInitSettings
 	TextureWrapMode wrapMode;
 	TextureFilterMode filterMode;
 	TextureFilterMode mipFilterMode;
+	// 0 or 1 is disabled. enable with powers of 2, or -1 to use highest supported value.
+	int32 anisotropy;
 	int32 width;
 	int32 height;
 	int32 depth;
@@ -123,6 +104,8 @@ typedef struct Texture
 	TextureWrapMode wrapMode;
 	TextureFilterMode filterMode;
 	TextureFilterMode mipFilterMode;
+	// 0 or 1 is disabled. enable with powers of 2, or -1 to use highest supported value.
+	int32 anisotropy;
 	int32 width;
 	int32 height;
 	int32 depth;

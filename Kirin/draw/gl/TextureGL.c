@@ -1,5 +1,6 @@
 #include "draw/gl/TextureGL.h"
 
+#include "common/Math.h"
 #include "draw/gl/CommonGL.h"
 
 #include "thirdparty/glad/glad.h"
@@ -73,7 +74,7 @@ static void UpdateFiltering(Texture* self)
 
 	if (self->hasMipmaps)
 	{
-		if (self->mipFilterMode > TextureMipFilterMode_Nearest)
+		if (self->mipFilterMode > TextureFilterMode_Nearest)
 		{
 			minFilter = minFilter == GL_NEAREST ? GL_NEAREST_MIPMAP_LINEAR : GL_LINEAR_MIPMAP_LINEAR;
 		}
@@ -90,6 +91,28 @@ static void UpdateFiltering(Texture* self)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
 	CheckGLError();
 
+	if (self->hasMipmaps)
+	{
+		static float maxAnisotropy = -1.0f;
+		if (maxAnisotropy < 0)
+		{
+			glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy);
+			Assert(maxAnisotropy >= 0);
+		}
+
+		float anisotropy = maxAnisotropy;
+		if (self->anisotropy >= 0)
+		{
+			anisotropy = Min((float)MaxI(self->anisotropy, 1), maxAnisotropy);
+		}
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy);
+	}
+	else
+	{
+		// disable anisotropy.
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1);
+	}
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 	CheckGLError();
 }
@@ -101,6 +124,7 @@ void TextureGL_Init(Texture* self, TextureInitSettings* initSettings)
 	self->wrapMode = initSettings->wrapMode;
 	self->filterMode = initSettings->filterMode;
 	self->mipFilterMode = initSettings->mipFilterMode;
+	self->anisotropy = initSettings->anisotropy;
 	self->width = initSettings->width;
 	self->height = initSettings->height;
 	self->depth = initSettings->depth;

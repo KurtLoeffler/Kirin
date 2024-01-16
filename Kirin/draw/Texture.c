@@ -21,7 +21,7 @@ void Texture_Init(Texture* self, TextureInitSettings* initSettings)
 	}
 	if (!newSettings.mipFilterMode)
 	{
-		newSettings.mipFilterMode = TextureMipFilterMode_Linear;
+		newSettings.mipFilterMode = TextureFilterMode_Linear;
 	}
 	AssertMessage(newSettings.format != TextureFormat_None, "a texture format must be specified.");
 	AssertMessage(newSettings.width > 0 && newSettings.height > 0, "texture width and height must be > 0.");
