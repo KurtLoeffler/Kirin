@@ -19,7 +19,8 @@ void Texture_Init(Texture* self, TextureInitSettings* initSettings)
 	{
 		newSettings.filterMode = TextureFilterMode_Linear;
 	}
-	AssertMessage(self->format != TextureFormat_None, "a texture format must be specified.");
+	AssertMessage(newSettings->format != TextureFormat_None, "a texture format must be specified.");
+	AssertMessage(newSettings->width > 0 && newSettings->height > 0, "texture width and height must be > 0.");
 
 	Draw_GetBackend()->textureInit(self, &newSettings);
 }
