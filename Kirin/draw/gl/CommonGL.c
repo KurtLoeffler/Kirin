@@ -1,6 +1,23 @@
 #include "draw/gl/CommonGL.h"
 
+#include "common/CString.h"
+
 #include "thirdparty/glad/glad.h"
+
+bool IsGLExtensionSupported(const char* extension)
+{
+	GLint numExtensions;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+	for (GLint i = 0; i < numExtensions; i++)
+	{
+		const GLubyte* ext = glGetStringi(GL_EXTENSIONS, i);
+		if (StrCmp((const char*)ext, extension, true) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 #if CONFIG_DEBUG
 static const char* GetGLErrorString(uint32 err)
