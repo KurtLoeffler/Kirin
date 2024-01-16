@@ -7,6 +7,10 @@ void Texture_Init(Texture* self, TextureInitSettings* initSettings)
 	MemSet(self, 0, sizeof(Texture));
 
 	TextureInitSettings newSettings = *initSettings;
+	if (!newSettings.type)
+	{
+		newSettings.type = TextureType_2D;
+	}
 	if (!newSettings.wrapMode)
 	{
 		newSettings.wrapMode = TextureWrapMode_Repeat;
@@ -15,6 +19,7 @@ void Texture_Init(Texture* self, TextureInitSettings* initSettings)
 	{
 		newSettings.filterMode = TextureFilterMode_Linear;
 	}
+	AssertMessage(self->format != TextureFormat_None, "a texture format must be specified.");
 
 	Draw_GetBackend()->textureInit(self, &newSettings);
 }
