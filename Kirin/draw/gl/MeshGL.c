@@ -85,11 +85,11 @@ void MeshGL_ApplyStructure(Mesh* self)
 		}
 
 		// configure vertex buffer with vertex format.
-		glVertexAttribPointer(i, item->componentCount, typeToGLType[item->type], GL_FALSE, item->stride, (void*)(size_t)item->offset);
+		glVertexAttribPointer(item->inputIndex, item->componentCount, typeToGLType[item->type], GL_FALSE, item->stride, (void*)(size_t)item->offset);
 		CheckGLError();
 
 		// enable vertex attribute layout location.
-		glEnableVertexAttribArray(i);
+		glEnableVertexAttribArray(item->inputIndex);
 		CheckGLError();
 	}
 

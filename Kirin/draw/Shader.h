@@ -26,7 +26,6 @@ typedef struct ShaderUniform
 typedef struct ShaderConstantBuffer
 {
 	char name[ShaderConstantBuffer_MaxName];
-	int32 index;
 	int32 bindingPoint;
 } ShaderConstantBuffer;
 

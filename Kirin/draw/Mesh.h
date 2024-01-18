@@ -51,6 +51,7 @@ static const char* VertexBufferUsage_ToString(VertexBufferUsage value)
 
 typedef struct VertexFormatItem
 {
+	int32 inputIndex;
 	int32 bufferIndex;
 	int32 offset;
 	int32 stride;
