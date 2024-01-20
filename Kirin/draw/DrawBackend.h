@@ -171,13 +171,7 @@ typedef struct DrawBackend
 	void (*vertexBufferInit)(VertexBuffer* vertexBuffer, VertexBufferUsage usage);
 	void (*vertexBufferUpdateData)(VertexBuffer* vertexBuffer, int32 offset, int32 size, void* data);
 	void (*vertexBufferFree)(VertexBuffer* vertexBuffer);
-	void (*setGeoType)(DrawState* drawState);
-	void (*setPolygonFillMode)(DrawState* drawState);
-	void (*setBlendMode)(DrawState* drawState);
-	void (*setCullMode)(DrawState* drawState);
-	void (*setDepthTestMode)(DrawState* drawState);
-	void (*setDepthWrite)(DrawState* drawState);
-	void (*setStencilState)(DrawState* drawState);
+	void (*drawStateUpdate)(DrawState* previousState, DrawState* state, bool forceUpdate);
 	void (*setViewport)(int32 x, int32 y, int32 width, int32 height);
 	void (*clearColor)(float r, float g, float b, float a);
 	void (*clearDepth)(float value);

@@ -274,6 +274,65 @@ static void SetStencilWrite(DrawState* drawState)
 	CheckGLError();
 }
 
+static void DrawStateUpdate(DrawState* previousState, DrawState* state, bool forceUpdate)
+{
+	if (forceUpdate || state->polygonFillMode != previousState->polygonFillMode)
+	{
+		SetPolygonFillMode(state);
+		previousState->polygonFillMode = state->polygonFillMode;
+		gDrawStatCounters.granularStateChanges++;
+	}
+
+	if (forceUpdate || state->blendMode != previousState->blendMode)
+	{
+		SetBlendMode(state);
+		previousState->blendMode = state->blendMode;
+		gDrawStatCounters.granularStateChanges++;
+	}
+
+	if (forceUpdate || state->cullMode != previousState->cullMode)
+	{
+		SetCullMode(state);
+		previousState->cullMode = state->cullMode;
+		gDrawStatCounters.granularStateChanges++;
+	}
+
+	if (forceUpdate || state->depthTestMode != previousState->depthTestMode)
+	{
+		SetDepthTestMode(state);
+		previousState->depthTestMode = state->depthTestMode;
+		gDrawStatCounters.granularStateChanges++;
+	}
+
+	if (forceUpdate || state->depthWrite != previousState->depthWrite)
+	{
+		SetDepthWrite(state);
+		previousState->depthWrite = state->depthWrite;
+		gDrawStatCounters.granularStateChanges++;
+	}
+
+	// PERF: is this slow?
+	if (forceUpdate ||
+		state->stencilFunc != previousState->stencilFunc ||
+		state->stencilOpFailStencil != previousState->stencilOpFailStencil ||
+		state->stencilOpFailDepth != previousState->stencilOpFailDepth ||
+		state->stencilOpPass != previousState->stencilOpPass ||
+		state->stencilMask != previousState->stencilMask ||
+		state->stencilFuncRef != previousState->stencilFuncRef ||
+		state->stencilFuncMask != previousState->stencilFuncMask)
+	{
+		SetStencilWrite(state);
+		previousState->stencilFunc = state->stencilFunc;
+		previousState->stencilOpFailStencil = state->stencilOpFailStencil;
+		previousState->stencilOpFailDepth = state->stencilOpFailDepth;
+		previousState->stencilOpPass = state->stencilOpPass;
+		previousState->stencilMask = state->stencilMask;
+		previousState->stencilFuncRef = state->stencilFuncRef;
+		previousState->stencilFuncMask = state->stencilFuncMask;
+		gDrawStatCounters.granularStateChanges++;
+	}
+}
+
 static void SetViewport(int32 x, int32 y, int32 width, int32 height)
 {
 	glViewport(x, y, width, height);
@@ -304,13 +363,7 @@ static void ClearStencil(int32 value)
 DrawBackend drawBackendGL = {
 	.init = Init,
 	.free = Free,
-	.setGeoType = SetGeoType,
-	.setPolygonFillMode = SetPolygonFillMode,
-	.setBlendMode = SetBlendMode,
-	.setCullMode = SetCullMode,
-	.setDepthTestMode = SetDepthTestMode,
-	.setDepthWrite = SetDepthWrite,
-	.setStencilState = SetStencilWrite,
+	.drawStateUpdate = DrawStateUpdate,
 	.setViewport = SetViewport,
 	.clearColor = ClearColor,
 	.clearDepth = ClearDepth,

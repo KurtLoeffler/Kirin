@@ -5,7 +5,7 @@ DrawStatCounters gDrawStatCounters;
 DrawBackend* currentBackend;
 
 DrawState currentDrawState;
-DrawState lastDrawState;
+DrawState previousDrawState;
 static bool currentDrawStateDirty;
 static bool forceFullStateDirty;
 
@@ -22,7 +22,7 @@ void Draw_Init(DrawBackend* backend)
 	currentBackend = backend;
 
 	currentDrawState = (DrawState){ 0 };
-	lastDrawState = currentDrawState;
+	previousDrawState = currentDrawState;
 	currentDrawStateDirty = true;
 	forceFullStateDirty = true;
 
@@ -140,67 +140,13 @@ static void CommitDrawState()
 {
 	if (forceFullStateDirty || currentDrawStateDirty)
 	{
-		if (forceFullStateDirty || currentDrawState.polygonFillMode != lastDrawState.polygonFillMode)
-		{
-			currentBackend->setPolygonFillMode(&currentDrawState);
-			lastDrawState.polygonFillMode = currentDrawState.polygonFillMode;
-			gDrawStatCounters.granularStateChanges++;
-		}
-
-		if (forceFullStateDirty || currentDrawState.blendMode != lastDrawState.blendMode)
-		{
-			currentBackend->setBlendMode(&currentDrawState);
-			lastDrawState.blendMode = currentDrawState.blendMode;
-			gDrawStatCounters.granularStateChanges++;
-		}
-
-		if (forceFullStateDirty || currentDrawState.cullMode != lastDrawState.cullMode)
-		{
-			currentBackend->setCullMode(&currentDrawState);
-			lastDrawState.cullMode = currentDrawState.cullMode;
-			gDrawStatCounters.granularStateChanges++;
-		}
-
-		if (forceFullStateDirty || currentDrawState.depthTestMode != lastDrawState.depthTestMode)
-		{
-			currentBackend->setDepthTestMode(&currentDrawState);
-			lastDrawState.depthTestMode = currentDrawState.depthTestMode;
-			gDrawStatCounters.granularStateChanges++;
-		}
-
-		if (forceFullStateDirty || currentDrawState.depthWrite != lastDrawState.depthWrite)
-		{
-			currentBackend->setDepthWrite(&currentDrawState);
-			lastDrawState.depthWrite = currentDrawState.depthWrite;
-			gDrawStatCounters.granularStateChanges++;
-		}
-
-		// PERF: is this slow?
-		if (forceFullStateDirty ||
-			currentDrawState.stencilFunc != lastDrawState.stencilFunc ||
-			currentDrawState.stencilOpFailStencil != lastDrawState.stencilOpFailStencil ||
-			currentDrawState.stencilOpFailDepth != lastDrawState.stencilOpFailDepth ||
-			currentDrawState.stencilOpPass != lastDrawState.stencilOpPass ||
-			currentDrawState.stencilMask != lastDrawState.stencilMask ||
-			currentDrawState.stencilFuncRef != lastDrawState.stencilFuncRef ||
-			currentDrawState.stencilFuncMask != lastDrawState.stencilFuncMask)
-		{
-			currentBackend->setStencilState(&currentDrawState);
-			lastDrawState.stencilFunc = currentDrawState.stencilFunc;
-			lastDrawState.stencilOpFailStencil = currentDrawState.stencilOpFailStencil;
-			lastDrawState.stencilOpFailDepth = currentDrawState.stencilOpFailDepth;
-			lastDrawState.stencilOpPass = currentDrawState.stencilOpPass;
-			lastDrawState.stencilMask = currentDrawState.stencilMask;
-			lastDrawState.stencilFuncRef = currentDrawState.stencilFuncRef;
-			lastDrawState.stencilFuncMask = currentDrawState.stencilFuncMask;
-			gDrawStatCounters.granularStateChanges++;
-		}
+		currentBackend->drawStateUpdate(&previousDrawState, &currentDrawState, forceFullStateDirty);
 
 		forceFullStateDirty = false;
 		currentDrawStateDirty = false;
 
 #if CONFIG_DEBUG
-		if (MemCmp(&currentDrawState, &lastDrawState, sizeof(DrawState)) != 0)
+		if (MemCmp(&previousDrawState, &currentDrawState, sizeof(DrawState)) != 0)
 		{
 			Error("draw state data mismatch.");
 		}
