@@ -180,6 +180,7 @@ typedef struct DrawBackend
 	void (*shaderFree)(Shader* shader);
 	void (*shaderSet)(Shader* shader);
 	void (*shaderSetUniformInt)(Shader* self, ShaderUniform* uniform, int32 arrayIndex, int32 value);
+	void (*shaderSetUniformFloat)(Shader* self, ShaderUniform* uniform, int32 arrayIndex, float value);
 	void (*shaderSetUniformTexture)(Shader* self, ShaderUniform* uniform, int32 arrayIndex, Texture* value);
 	void (*constantBufferInit)(ConstantBuffer* self, int64 size);
 	void (*constantBufferAttachToShader)(ConstantBuffer* self, Shader* shader, ShaderConstantBuffer* constantBuffer);

@@ -52,4 +52,5 @@ ShaderAttribute* Shader_FindAttribute(Shader* self, char* name);
 ShaderUniform* Shader_FindUniform(Shader* self, char* name);
 ShaderConstantBuffer* Shader_FindConstantBuffer(Shader* self, char* name);
 void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayIndex, int32 value);
+void Shader_SetUniformFloat(Shader* self, ShaderUniform* uniform, int32 arrayIndex, float value);
 void Shader_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arrayIndex, Texture* value);

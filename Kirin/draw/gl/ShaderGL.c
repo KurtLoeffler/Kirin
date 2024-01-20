@@ -309,6 +309,17 @@ void ShaderGL_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayInd
 	CheckGLError();
 }
 
+void ShaderGL_SetUniformFloat(Shader* self, ShaderUniform* uniform, int32 arrayIndex, float value)
+{
+	// gl 4.1+, otherwise must useProgram and glUniform*.
+	if (WindowBackendGL_CompareGLVersion(4, 1) > 0)
+	{
+		Error("OpenGL version < 4.1 not supported.")
+	}
+	glProgramUniform1f(self->program, uniform->location+arrayIndex, value);
+	CheckGLError();
+}
+
 static int32 GetTextureUnitCount()
 {
 	static int32 count = -1;

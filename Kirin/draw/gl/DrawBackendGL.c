@@ -372,6 +372,7 @@ DrawBackend drawBackendGL = {
 	.shaderFree = ShaderGL_Free,
 	.shaderSet = SetShader,
 	.shaderSetUniformInt = ShaderGL_SetUniformInt,
+	.shaderSetUniformFloat = ShaderGL_SetUniformFloat,
 	.shaderSetUniformTexture = ShaderGL_SetUniformTexture,
 	.constantBufferInit = ConstantBufferGL_Init,
 	.constantBufferAttachToShader = ConstantBufferGL_AttachToShader,

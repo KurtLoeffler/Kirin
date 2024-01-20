@@ -90,6 +90,15 @@ void Shader_SetUniformInt(Shader* self, ShaderUniform* uniform, int32 arrayIndex
 	Draw_GetBackend()->shaderSetUniformInt(self, uniform, arrayIndex, value);
 }
 
+void Shader_SetUniformFloat(Shader* self, ShaderUniform* uniform, int32 arrayIndex, float value)
+{
+	if (Draw_GetShader() == self)
+	{
+		Draw_Flush();
+	}
+	Draw_GetBackend()->shaderSetUniformFloat(self, uniform, arrayIndex, value);
+}
+
 void Shader_SetUniformTexture(Shader* self, ShaderUniform* uniform, int32 arrayIndex, Texture* value)
 {
 	if (Draw_GetShader() == self)
