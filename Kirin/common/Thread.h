@@ -6,7 +6,7 @@
 #if BITNESS_64
 __forceinline void KMemoryBarrier() { __faststorefence(); }
 #else
-__forceinline void KMemoryBarrier() { long Barrier; _InterlockedOr(&Barrier, 0); }
+__forceinline void KMemoryBarrier() { long barrier; _InterlockedOr(&barrier, 0); }
 #endif
 #else
 #error KMemoryBarrier not implemented on this platform.
