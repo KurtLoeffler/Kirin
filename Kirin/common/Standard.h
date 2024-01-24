@@ -29,6 +29,8 @@ typedef int bool;
 void* MAlloc(size_t size);
 void* MRealloc(void* block, size_t size);
 void MFree(void* ptr);
+void MAlloc_NoLeakCheck(void* ptr);
+bool MAlloc_DetectLeaks();
 
 void MemCpy(void* dest, const void* source, size_t size);
 void MemSet(void* dest, uint8 source, size_t size);

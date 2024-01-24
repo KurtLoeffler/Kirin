@@ -5,29 +5,138 @@
 #include <stdarg.h>
 #include <string.h>
 
+#define MALLOC_TRACKALLOCATIONS CONFIGTYPE_DEV
+#define MAlloc_Magic 0xcacacd35
+
+typedef struct MAllocHeader
+{
+	uint32 magic0;
+	struct MAllocHeader* prev;
+	struct MAllocHeader* next;
+	size_t size;
+	bool noLeakCheck;
+	uint32 magic1;
+#if BITNESS_64
+	uint32 pad[1];
+#else
+	uint32 pad[2];
+#endif
+} MAllocHeader;
+static_assert(sizeof(MAllocHeader)%16 == 0, "size of MAllocHeader must be divisible by 16.");
+
+MAllocHeader rootMAllocHeader;
+
 void* MAlloc(size_t size)
 {
-	void* result = malloc(size);
+#if MALLOC_TRACKALLOCATIONS
+	size += sizeof(MAllocHeader);
+#endif
+
+	MAllocHeader* result = malloc(size);
 	if (!result)
 	{
 		Error("allocation failed.");
 	}
+
+#if MALLOC_TRACKALLOCATIONS
+	MemSet(result, 0, sizeof(MAllocHeader));
+	result->magic0 = MAlloc_Magic;
+	result->magic1 = MAlloc_Magic;
+	result->prev = &rootMAllocHeader;
+	result->next = rootMAllocHeader.next;
+	if (result->next)
+	{
+		result->next->prev = result;
+	}
+	rootMAllocHeader.next = result;
+	result += 1;
+#endif
 	return result;
 }
 
 void* MRealloc(void* block, size_t size)
 {
-	void* result = realloc(block, size);
+#if MALLOC_TRACKALLOCATIONS
+	MAllocHeader* header = block ? ((MAllocHeader*)block)-1 : null;
+	MAllocHeader* prev = null;
+	MAllocHeader* next = null;
+	if (header)
+	{
+		Assert(header->magic0 == MAlloc_Magic && header->magic1 == MAlloc_Magic);
+
+		prev = header->prev;
+		next = header->next;
+		block = header;
+	}
+	size += sizeof(MAllocHeader);
+#endif
+	MAllocHeader* result = realloc(block, size);
 	if (!result)
 	{
 		Error("allocation failed.");
 	}
+
+#if MALLOC_TRACKALLOCATIONS
+	if (header && result != block)
+	{
+		if (prev)
+		{
+			prev->next = result;
+		}
+		if (next)
+		{
+			next->prev = result;
+		}
+	}
+	result += 1;
+#endif
 	return result;
 }
 
 void MFree(void* ptr)
 {
+#if MALLOC_TRACKALLOCATIONS
+	if (ptr)
+	{
+		MAllocHeader* header = ((MAllocHeader*)ptr)-1;
+		Assert(header->magic0 == MAlloc_Magic && header->magic1 == MAlloc_Magic);
+
+		if (header->prev)
+		{
+			header->prev->next = header->next;
+		}
+		if (header->next)
+		{
+			header->next->prev = header->prev;
+		}
+		ptr = header;
+	}
+#endif
 	free(ptr);
+}
+
+void MAlloc_NoLeakCheck(void* ptr)
+{
+#if MALLOC_TRACKALLOCATIONS
+	MAllocHeader* header = ((MAllocHeader*)ptr)-1;
+	header->noLeakCheck = true;
+#endif
+}
+
+bool MAlloc_DetectLeaks()
+{
+#if MALLOC_TRACKALLOCATIONS
+	MAllocHeader* header = rootMAllocHeader.next;
+	while (header)
+	{
+		if (!header->noLeakCheck)
+		{
+			return true;
+		}
+		header = header->next;
+	}
+#endif
+	return false;
 }
 
 void MemCpy(void* dest, const void* source, size_t size)
