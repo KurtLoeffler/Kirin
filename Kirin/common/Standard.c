@@ -43,7 +43,8 @@ void* MAlloc(size_t size)
 	MemSet(result, 0, sizeof(MAllocHeader));
 	result->magic0 = MAlloc_Magic;
 	result->magic1 = MAlloc_Magic;
-	
+	result->size = size-sizeof(MAllocHeader);
+
 	Mutex_Lock(&mAllocMutex);
 	result->prev = &rootMAllocHeader;
 	result->next = rootMAllocHeader.next;
@@ -89,6 +90,8 @@ void* MRealloc(void* block, size_t size)
 	}
 
 #if MALLOC_TRACKALLOCATIONS
+	result->size = size-sizeof(MAllocHeader);
+
 	if (header && result != block)
 	{
 		if (prev)
@@ -107,7 +110,7 @@ void* MRealloc(void* block, size_t size)
 	return result;
 }
 
-static void RemoveMAllocHeader(MAllocHeader* header)
+static void UnlinkMAllocHeader(MAllocHeader* header)
 {
 	if (header->prev)
 	{
@@ -127,7 +130,7 @@ void MFree(void* ptr)
 		MAllocHeader* header = ((MAllocHeader*)ptr)-1;
 		Assert(header->magic0 == MAlloc_Magic && header->magic1 == MAlloc_Magic);
 		Mutex_Lock(&mAllocMutex);
-		RemoveMAllocHeader(header);
+		UnlinkMAllocHeader(header);
 		Mutex_Unlock(&mAllocMutex);
 		ptr = header;
 	}
@@ -141,7 +144,7 @@ void MAlloc_NoLeakCheck(void* ptr)
 	MAllocHeader* header = ((MAllocHeader*)ptr)-1;
 	Assert(header->magic0 == MAlloc_Magic && header->magic1 == MAlloc_Magic);
 	Mutex_Lock(&mAllocMutex);
-	RemoveMAllocHeader(header);
+	UnlinkMAllocHeader(header);
 	Mutex_Unlock(&mAllocMutex);
 #endif
 }
