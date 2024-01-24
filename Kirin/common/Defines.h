@@ -37,3 +37,9 @@
 #define NDEBUG 1
 #endif
 #endif
+
+#if _WIN64
+#define BITNESS_64 1
+#else
+#define BITNESS_32 1
+#endif
