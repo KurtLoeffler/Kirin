@@ -15,12 +15,11 @@ typedef struct MAllocHeader
 	struct MAllocHeader* prev;
 	struct MAllocHeader* next;
 	size_t size;
-	bool noLeakCheck;
 	uint32 magic1;
 #if BITNESS_64
-	uint32 pad[1];
-#else
 	uint32 pad[2];
+#else
+	uint32 pad[3];
 #endif
 } MAllocHeader;
 static_assert(sizeof(MAllocHeader)%16 == 0, "size of MAllocHeader must be divisible by 16.");
@@ -108,6 +107,18 @@ void* MRealloc(void* block, size_t size)
 	return result;
 }
 
+static void RemoveMAllocHeader(MAllocHeader* header)
+{
+	if (header->prev)
+	{
+		header->prev->next = header->next;
+	}
+	if (header->next)
+	{
+		header->next->prev = header->prev;
+	}
+}
+
 void MFree(void* ptr)
 {
 #if MALLOC_TRACKALLOCATIONS
@@ -116,14 +127,7 @@ void MFree(void* ptr)
 		MAllocHeader* header = ((MAllocHeader*)ptr)-1;
 		Assert(header->magic0 == MAlloc_Magic && header->magic1 == MAlloc_Magic);
 		Mutex_Lock(&mAllocMutex);
-		if (header->prev)
-		{
-			header->prev->next = header->next;
-		}
-		if (header->next)
-		{
-			header->next->prev = header->prev;
-		}
+		RemoveMAllocHeader(header);
 		Mutex_Unlock(&mAllocMutex);
 		ptr = header;
 	}
@@ -136,26 +140,21 @@ void MAlloc_NoLeakCheck(void* ptr)
 #if MALLOC_TRACKALLOCATIONS
 	MAllocHeader* header = ((MAllocHeader*)ptr)-1;
 	Assert(header->magic0 == MAlloc_Magic && header->magic1 == MAlloc_Magic);
-	header->noLeakCheck = true;
+	Mutex_Lock(&mAllocMutex);
+	RemoveMAllocHeader(header);
+	Mutex_Unlock(&mAllocMutex);
 #endif
 }
 
 bool MAlloc_DetectLeaks()
 {
+	bool result = false;
 #if MALLOC_TRACKALLOCATIONS
 	Mutex_Lock(&mAllocMutex);
-	MAllocHeader* header = rootMAllocHeader.next;
-	while (header)
-	{
-		if (!header->noLeakCheck)
-		{
-			return true;
-		}
-		header = header->next;
-	}
+	result = rootMAllocHeader.next != null;
 	Mutex_Unlock(&mAllocMutex);
 #endif
-	return false;
+	return result;
 }
 
 void MemCpy(void* dest, const void* source, size_t size)
