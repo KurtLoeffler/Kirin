@@ -1,5 +1,6 @@
 
 #include "common/Standard.h"
+#include "common/Thread.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -25,6 +26,7 @@ typedef struct MAllocHeader
 static_assert(sizeof(MAllocHeader)%16 == 0, "size of MAllocHeader must be divisible by 16.");
 
 MAllocHeader rootMAllocHeader;
+Mutex mAllocMutex;
 
 void* MAlloc(size_t size)
 {
@@ -42,6 +44,8 @@ void* MAlloc(size_t size)
 	MemSet(result, 0, sizeof(MAllocHeader));
 	result->magic0 = MAlloc_Magic;
 	result->magic1 = MAlloc_Magic;
+	
+	Mutex_Lock(&mAllocMutex);
 	result->prev = &rootMAllocHeader;
 	result->next = rootMAllocHeader.next;
 	if (result->next)
@@ -49,6 +53,8 @@ void* MAlloc(size_t size)
 		result->next->prev = result;
 	}
 	rootMAllocHeader.next = result;
+	Mutex_Unlock(&mAllocMutex);
+
 	result += 1;
 #endif
 	return result;
@@ -56,7 +62,14 @@ void* MAlloc(size_t size)
 
 void* MRealloc(void* block, size_t size)
 {
+	if (!block)
+	{
+		return MAlloc(size);
+	}
+
 #if MALLOC_TRACKALLOCATIONS
+	// PERF: locking while reallocating.
+	Mutex_Lock(&mAllocMutex);
 	MAllocHeader* header = block ? ((MAllocHeader*)block)-1 : null;
 	MAllocHeader* prev = null;
 	MAllocHeader* next = null;
@@ -88,6 +101,8 @@ void* MRealloc(void* block, size_t size)
 			next->prev = result;
 		}
 	}
+	Mutex_Unlock(&mAllocMutex);
+
 	result += 1;
 #endif
 	return result;
@@ -100,7 +115,7 @@ void MFree(void* ptr)
 	{
 		MAllocHeader* header = ((MAllocHeader*)ptr)-1;
 		Assert(header->magic0 == MAlloc_Magic && header->magic1 == MAlloc_Magic);
-
+		Mutex_Lock(&mAllocMutex);
 		if (header->prev)
 		{
 			header->prev->next = header->next;
@@ -109,6 +124,7 @@ void MFree(void* ptr)
 		{
 			header->next->prev = header->prev;
 		}
+		Mutex_Unlock(&mAllocMutex);
 		ptr = header;
 	}
 #endif
@@ -119,6 +135,7 @@ void MAlloc_NoLeakCheck(void* ptr)
 {
 #if MALLOC_TRACKALLOCATIONS
 	MAllocHeader* header = ((MAllocHeader*)ptr)-1;
+	Assert(header->magic0 == MAlloc_Magic && header->magic1 == MAlloc_Magic);
 	header->noLeakCheck = true;
 #endif
 }
@@ -126,6 +143,7 @@ void MAlloc_NoLeakCheck(void* ptr)
 bool MAlloc_DetectLeaks()
 {
 #if MALLOC_TRACKALLOCATIONS
+	Mutex_Lock(&mAllocMutex);
 	MAllocHeader* header = rootMAllocHeader.next;
 	while (header)
 	{
@@ -135,6 +153,7 @@ bool MAlloc_DetectLeaks()
 		}
 		header = header->next;
 	}
+	Mutex_Unlock(&mAllocMutex);
 #endif
 	return false;
 }
