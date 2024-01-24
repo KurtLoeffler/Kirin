@@ -4,22 +4,25 @@
 #include <windows.h>
 #include <stdio.h>
 
-void Mutex_Init(Mutex* self)
-{
-    self->internalHandle = CreateMutex(NULL, FALSE, NULL);
-    if (!self->internalHandle)
-    {
-        ErrorF("failed to create mutex: %d", GetLastError());
-    }
-}
-
 void Mutex_Free(Mutex* self)
 {
     CloseHandle(self->internalHandle);
 }
 
-void Mutex_Lock(Mutex* self)
+void Mutex_Lock(volatile Mutex* self)
 {
+    if (self->internalHandle == null)
+    {
+        HANDLE p = CreateMutex(NULL, FALSE, NULL);
+        if (!p)
+        {
+            ErrorF("failed to create mutex: %d", GetLastError());
+        }
+        if (InterlockedCompareExchangePointer(&self->internalHandle, (void*)p, null) != null)
+        {
+            CloseHandle(p);
+        }
+    }
     WaitForSingleObject(self->internalHandle, INFINITE);
 }
 
