@@ -85,16 +85,16 @@ void Window_Present(Window* self)
 	self->backend->present(self);
 }
 
-void Window_ProcessEvents(Window* self)
+void Window_ProcessEvents(Window* self, InputState* inputState)
 {
 	SDL_Window* sdlWindow = (SDL_Window*)self->internalHandle;
 
-	Input_ClearFrameStates();
+	Input_ClearFrameStates(inputState);
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
-		SDL2Input_HandleEvent(&event);
+		SDL2Input_HandleEvent(inputState, &event);
 		switch (event.type)
 		{
 		case SDL_QUIT:
@@ -132,7 +132,7 @@ void Window_ProcessEvents(Window* self)
 		}
 	}
 
-	if ((Input_GetKey(Keycode_LAlt, false) || Input_GetKey(Keycode_RAlt, false)) && Input_GetKeyPressed(Keycode_Enter, false))
+	if ((Input_GetKey(inputState, Keycode_LAlt, false) || Input_GetKey(inputState, Keycode_RAlt, false)) && Input_GetKeyPressed(inputState, Keycode_Enter, false))
 	{
 		if (Window_GetWindowMode(self) == WindowMode_Window)
 		{
@@ -143,8 +143,8 @@ void Window_ProcessEvents(Window* self)
 			Window_SetWindowMode(self, WindowMode_Window);
 		}
 
-		Input_ClearFrameStates();
-		Input_ClearFixedFrameStates();
+		Input_ClearFrameStates(inputState);
+		Input_ClearFixedFrameStates(inputState);
 	}
 }
 

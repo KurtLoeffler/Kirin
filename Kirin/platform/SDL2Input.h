@@ -5,5 +5,5 @@
 
 #include "SDL.h"
 
-void SDL2Input_HandleEvent(SDL_Event* event);
+void SDL2Input_HandleEvent(InputState* state, SDL_Event* event);
 

@@ -2,6 +2,7 @@
 
 #include "common/Standard.h"
 #include "common/Space.h"
+#include "common/Input.h"
 #include "platform/WindowBackend.h"
 
 typedef enum WindowMode
@@ -64,7 +65,7 @@ extern Window gWindow;
 void Window_Init(Window* self, WindowBackend* backend, const char* title, int32 width, int32 height);
 void Window_Free(Window* self);
 void Window_Present(Window* self);
-void Window_ProcessEvents(Window* self);
+void Window_ProcessEvents(Window* self, InputState* inputState);
 VSyncMode Window_GetVSyncMode(Window* self);
 void Window_SetVSyncMode(Window* self, VSyncMode value);
 WindowMode Window_GetWindowMode(Window* self);

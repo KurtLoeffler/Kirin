@@ -69,13 +69,14 @@ static const char* GamePadInput_ToString(GamePadInput value)
 	static_assert(GamePadInput_Count == 22, "enum has changed.");
 }
 
-#define GamePadState_NameDataLength (256)
+#define Input_GamePadActivationThreshold (Int16Max/2)
+#define Input_MaxGamePads (8)
 typedef struct GamePadState
 {
 	bool isValid;
 	int32 id;
 	
-	char name[GamePadState_NameDataLength];
+	char name[MaxPathLength];
 	int16 values[(int32)GamePadInput_Count];
 	int16 lastValues[(int32)GamePadInput_Count];
 
@@ -83,50 +84,76 @@ typedef struct GamePadState
 	int16 fixedLastValues[(int32)GamePadInput_Count];
 } GamePadState;
 
-void Input_ClearFrameStates();
-void Input_ClearFixedFrameStates();
+#define Input_MaxMouseButtons 5
+typedef struct InputState
+{
+	void (*onKeyboardEventHandled)(Keycode keycode, bool value, bool repeat);
 
-typedef void (*Input_OnKeyboardEventHandledFunc)(Keycode keycode, bool state, bool repeat);
-extern Input_OnKeyboardEventHandledFunc Input_onKeyboardEventHandled;
+	int keyStates[(int32)Keycode_Count];
+	int keyPressedStates[(int32)Keycode_Count];
+	int keyReleasedStates[(int32)Keycode_Count];
 
-void Input_HandleKeyboardEvent(Keycode keycode, bool state, bool repeat);
+	int fixedKeyPressedStates[(int32)Keycode_Count];
+	int fixedKeyReleasedStates[(int32)Keycode_Count];
 
-bool Input_GetKeyPressed(Keycode keycode, bool isFixed);
-bool Input_GetKeyPressedRepeat(Keycode keycode, bool isFixed);
-bool Input_GetKeyReleased(Keycode keycode, bool isFixed);
-bool Input_GetKey(Keycode keycode, bool isFixed);
+	int mouseButtonStates[Input_MaxMouseButtons];
+	int mouseButtonPressedStates[Input_MaxMouseButtons];
+	int mouseButtonReleasedStates[Input_MaxMouseButtons];
 
-bool Input_GetMouseButton(int32 button, bool isFixed);
-bool Input_GetMouseButtonPressed(int32 button, bool isFixed);
-bool Input_GetMouseButtonReleased(int32 button, bool isFixed);
-float Input_GetMouseX(bool isFixed);
-float Input_GetMouseY(bool isFixed);
-float Input_GetMouseMotionX(bool isFixed);
-float Input_GetMouseMotionY(bool isFixed);
-float Input_GetMouseWheelX(bool isFixed);
-float Input_GetMouseWheelY(bool isFixed);
+	int fixedMouseButtonPressedStates[Input_MaxMouseButtons];
+	int fixedMouseButtonReleasedStates[Input_MaxMouseButtons];
+
+	float mouseX;
+	float mouseY;
+	float mouseDeltaX;
+	float mouseDeltaY;
+	float fixedMouseDeltaX;
+	float fixedMouseDeltaY;
+
+	float mouseWheelX;
+	float mouseWheelY;
+	float fixedMouseWheelX;
+	float fixedMouseWheelY;
+
+	void (*onGamePadInputEventHandled)(int32 id, GamePadInput input, int16 value);
+	void (*onGamePadRegisterEventHandled)(int32 id, bool registered);
+
+	GamePadState gamePadStates[Input_MaxGamePads];
+} InputState;
+
+void Input_ClearFrameStates(InputState* state);
+void Input_ClearFixedFrameStates(InputState* state);
+
+void Input_HandleKeyboardEvent(InputState* state, Keycode keycode, bool value, bool repeat);
+
+bool Input_GetKeyPressed(InputState* state, Keycode keycode, bool isFixed);
+bool Input_GetKeyPressedRepeat(InputState* state, Keycode keycode, bool isFixed);
+bool Input_GetKeyReleased(InputState* state, Keycode keycode, bool isFixed);
+bool Input_GetKey(InputState* state, Keycode keycode, bool isFixed);
+
+bool Input_GetMouseButton(InputState* state, int32 button, bool isFixed);
+bool Input_GetMouseButtonPressed(InputState* state, int32 button, bool isFixed);
+bool Input_GetMouseButtonReleased(InputState* state, int32 button, bool isFixed);
+float Input_GetMouseX(InputState* state, bool isFixed);
+float Input_GetMouseY(InputState* state, bool isFixed);
+float Input_GetMouseMotionX(InputState* state, bool isFixed);
+float Input_GetMouseMotionY(InputState* state, bool isFixed);
+float Input_GetMouseWheelX(InputState* state, bool isFixed);
+float Input_GetMouseWheelY(InputState* state, bool isFixed);
 float Input_GetMouseWheelTickScalerX();
 float Input_GetMouseWheelTickScalerY();
-void Input_HandleMouseButtonEvent(int32 button, bool state);
-void Input_HandleMouseMotionEvent(float x, float y, float deltaX, float deltaY);
-void Input_HandleWheelEvent(float x, float y);
+void Input_HandleMouseButtonEvent(InputState* state, int32 button, bool value);
+void Input_HandleMouseMotionEvent(InputState* state, float x, float y, float deltaX, float deltaY);
+void Input_HandleWheelEvent(InputState* state, float x, float y);
 
-typedef void (*Input_OnGamePadInputEventHandledFunc)(int32 id, GamePadInput input, int16 value);
-extern Input_OnGamePadInputEventHandledFunc Input_onGamePadInputEventHandled;
+int32 Input_GetGamePadStateIndex(InputState* state, int32 id);
+GamePadState* Input_GetGamePadState(InputState* state, int32 id);
+int32 Input_GetGamePadCount(InputState* state);
+int32 Input_RegisterGamePad(InputState* state, int32 id, const char* name);
+void Input_UnregisterGamePad(InputState* state, int32 id);
+void Input_HandleGamepadInputEvent(InputState* state, int32 id, GamePadInput input, int16 value);
 
-typedef void (*Input_OnGamePadRegisterEventHandledFunc)(int32 id, bool registered);
-extern Input_OnGamePadRegisterEventHandledFunc Input_onGamePadRegisterEventHandled;
-
-#define Input_GamePadActivationThreshold (Int16Max/2)
-#define Input_MaxGamePads (8)
-int32 Input_GetGamePadStateIndex(int32 id);
-GamePadState* Input_GetGamePadState(int32 id);
-int32 Input_GetGamePadCount();
-int32 Input_RegisterGamePad(int32 id, const char* name);
-void Input_UnregisterGamePad(int32 id);
-void Input_HandleGamepadInputEvent(int32 id, GamePadInput input, int16 value);
-
-int16 Input_GetGamePadInput(int32 id, GamePadInput input, bool isFixed);
-bool Input_GetGamePadInputActive(int32 id, GamePadInput input, bool isFixed);
-bool Input_GetGamePadInputPressed(int32 id, GamePadInput input, bool isFixed);
-bool Input_GetGamePadInputReleased(int32 id, GamePadInput input, bool isFixed);
+int16 Input_GetGamePadInput(InputState* state, int32 id, GamePadInput input, bool isFixed);
+bool Input_GetGamePadInputActive(InputState* state, int32 id, GamePadInput input, bool isFixed);
+bool Input_GetGamePadInputPressed(InputState* state, int32 id, GamePadInput input, bool isFixed);
+bool Input_GetGamePadInputReleased(InputState* state, int32 id, GamePadInput input, bool isFixed);

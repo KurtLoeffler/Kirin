@@ -93,7 +93,7 @@ Keycode ZXSDL2KeycodeToKey(SDL_Keycode scancode)
 	}
 }
 
-static void TryAddGamePadDevice(int32 joystickIndex)
+static void TryAddGamePadDevice(InputState* state, int32 joystickIndex)
 {
 	if (SDL_IsGameController(joystickIndex))
 	{
@@ -108,7 +108,7 @@ static void TryAddGamePadDevice(int32 joystickIndex)
 			ZXPrintF("joystick guid: %s\n", guid);
 #endif
 			int32 id = SDL_JoystickInstanceID(joystick);
-			Input_RegisterGamePad(id, SDL_GameControllerName(gameController));
+			Input_RegisterGamePad(state, id, SDL_GameControllerName(gameController));
 		}
 		else
 		{
@@ -117,22 +117,22 @@ static void TryAddGamePadDevice(int32 joystickIndex)
 	}
 }
 
-static void TryRemoveGamePadDevice(int32 id)
+static void TryRemoveGamePadDevice(InputState* state, int32 id)
 {
-	if (Input_GetGamePadStateIndex(id) >= 0)
+	if (Input_GetGamePadStateIndex(state, id) >= 0)
 	{
-		Input_UnregisterGamePad(id);
+		Input_UnregisterGamePad(state, id);
 	}
 }
 
-void SDL2Input_HandleEvent(SDL_Event* event)
+void SDL2Input_HandleEvent(InputState* state, SDL_Event* event)
 {
 	if (event->type == SDL_KEYDOWN || event->type == SDL_KEYUP)
 	{
 		Keycode keycode = ZXSDL2KeycodeToKey(event->key.keysym.sym);
 		if (keycode != Keycode_None)
 		{
-			Input_HandleKeyboardEvent(keycode, event->type == SDL_KEYDOWN, event->key.repeat);
+			Input_HandleKeyboardEvent(state, keycode, event->type == SDL_KEYDOWN, event->key.repeat);
 		}
 	}
 	else if (event->type == SDL_MOUSEBUTTONDOWN || event->type == SDL_MOUSEBUTTONUP)
@@ -160,7 +160,7 @@ void SDL2Input_HandleEvent(SDL_Event* event)
 		}
 		if (mouseButton >= 0)
 		{
-			Input_HandleMouseButtonEvent(mouseButton, event->type == SDL_MOUSEBUTTONDOWN);
+			Input_HandleMouseButtonEvent(state, mouseButton, event->type == SDL_MOUSEBUTTONDOWN);
 		}
 	}
 	else if (event->type == SDL_MOUSEMOTION)
@@ -184,19 +184,19 @@ void SDL2Input_HandleEvent(SDL_Event* event)
 		float relX = (float)event->motion.xrel/scaleFactor;
 		float relY = (float)event->motion.yrel/scaleFactor;
 
-		Input_HandleMouseMotionEvent(x, y, relX, relY);
+		Input_HandleMouseMotionEvent(state, x, y, relX, relY);
 	}
 	else if (event->type == SDL_MOUSEWHEEL)
 	{
-		Input_HandleWheelEvent((float)event->wheel.preciseX, (float)event->wheel.preciseY);
+		Input_HandleWheelEvent(state, (float)event->wheel.preciseX, (float)event->wheel.preciseY);
 	}
 	else if (event->type == SDL_CONTROLLERDEVICEADDED)
 	{
-		TryAddGamePadDevice(event->cdevice.which);
+		TryAddGamePadDevice(state, event->cdevice.which);
 	}
 	else if (event->type == SDL_CONTROLLERDEVICEREMOVED)
 	{
-		TryRemoveGamePadDevice(event->cdevice.which);
+		TryRemoveGamePadDevice(state, event->cdevice.which);
 	}
 	else if (event->type == SDL_CONTROLLERAXISMOTION || event->type == SDL_CONTROLLERBUTTONUP || event->type == SDL_CONTROLLERBUTTONDOWN)
 	{
@@ -299,9 +299,9 @@ void SDL2Input_HandleEvent(SDL_Event* event)
 
 		if (input > GamePadInput_None && input < GamePadInput_Count)
 		{
-			if (Input_GetGamePadStateIndex(id) >= 0)
+			if (Input_GetGamePadStateIndex(state, id) >= 0)
 			{
-				Input_HandleGamepadInputEvent(id, input, value);
+				Input_HandleGamepadInputEvent(state, id, input, value);
 			}
 		}
 	}
