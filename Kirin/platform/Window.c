@@ -132,7 +132,7 @@ void Window_ProcessEvents(Window* self, InputState* inputState)
 		}
 	}
 
-	if ((Input_GetKey(inputState, Keycode_LAlt, false) || Input_GetKey(inputState, Keycode_RAlt, false)) && Input_GetKeyPressed(inputState, Keycode_Enter, false))
+	if ((Input_GetKey(inputState, Keycode_LAlt) || Input_GetKey(inputState, Keycode_RAlt)) && Input_GetKeyPressed(inputState, Keycode_Enter))
 	{
 		if (Window_GetWindowMode(self) == WindowMode_Window)
 		{
@@ -143,8 +143,7 @@ void Window_ProcessEvents(Window* self, InputState* inputState)
 			Window_SetWindowMode(self, WindowMode_Window);
 		}
 
-		Input_ClearFrameStates(inputState);
-		Input_ClearFixedFrameStates(inputState);
+		Input_ClearFrameStatesAndDependents(inputState);
 	}
 }
 

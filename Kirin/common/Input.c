@@ -2,6 +2,8 @@
 
 #include "common/CString.h"
 
+GamePadEntry gamePadEntries[Input_MaxGamePads];
+
 const char* Keycode_ToString(Keycode keycode)
 {
 	switch (keycode)
@@ -20,6 +22,7 @@ void Input_ClearFrameStates(InputState* state)
 	for (int32 i = 0; i < (int32)Keycode_Count; i++)
 	{
 		state->keyPressedStates[i] = 0;
+		state->keyPressedRepeatStates[i] = 0;
 		state->keyReleasedStates[i] = 0;
 	}
 
@@ -36,68 +39,64 @@ void Input_ClearFrameStates(InputState* state)
 
 	for (int32 i = 0; i < Input_MaxGamePads; i++)
 	{
-		GamePadState* gamePadState = &state->gamePadStates[i];
-		if (gamePadState->isValid)
+		GamePadEntry* gamePadEntry = &gamePadEntries[i];
+		if (gamePadEntry->isValid)
 		{
-			for (int32 j = 0; j < (int32)GamePadInput_Count; j++)
+			GamePadState* gamePadState = &state->gamePadStates[i];
+			for (int32 i = 0; i < GamePadInput_Count; i++)
 			{
-				gamePadState->lastValues[j] = gamePadState->values[j];
+				gamePadState->pressed[i] = 0;
+				gamePadState->released[i] = 0;
 			}
 		}
 	}
 }
 
-void Input_ClearFixedFrameStates(InputState* state)
+void Input_ClearFrameStatesAndDependents(InputState* state)
 {
-	for (int32 i = 0; i < (int32)Keycode_Count; i++)
+	while (state)
 	{
-		state->fixedKeyPressedStates[i] = 0;
-		state->fixedKeyReleasedStates[i] = 0;
+		Input_ClearFrameStates(state);
+		state = state->dependent;
 	}
+}
 
-	for (int32 i = 0; i < Input_MaxMouseButtons; i++)
+static DependentHandleKeyboardInput(InputState* state, InputState* dependentState, Keycode keycode, bool value)
+{
+	dependentState->keyStates[(int32)keycode] = state->keyStates[(int32)keycode];
+	if (value)
 	{
-		state->fixedMouseButtonPressedStates[i] = 0;
-		state->fixedMouseButtonReleasedStates[i] = 0;
+		dependentState->keyPressedStates[(int32)keycode] = MaxI(dependentState->keyPressedStates[(int32)keycode], state->keyPressedStates[(int32)keycode]);
+		dependentState->keyPressedRepeatStates[(int32)keycode] = MaxI(dependentState->keyPressedRepeatStates[(int32)keycode], state->keyPressedRepeatStates[(int32)keycode]);
 	}
-
-	state->fixedMouseDeltaX = 0;
-	state->fixedMouseDeltaY = 0;
-	state->fixedMouseWheelX = 0;
-	state->fixedMouseWheelY = 0;
-
-	for (int32 i = 0; i < Input_MaxGamePads; i++)
+	if (!value)
 	{
-		GamePadState* gamePadState = &state->gamePadStates[i];
-		if (gamePadState->isValid)
-		{
-			for (int32 j = 0; j < (int32)GamePadInput_Count; j++)
-			{
-				gamePadState->fixedLastValues[j] = gamePadState->fixedValues[j];
-
-				// align fixedValues with current values.
-				gamePadState->fixedValues[j] = gamePadState->values[j];
-			}
-		}
+		dependentState->keyReleasedStates[(int32)keycode] = MaxI(dependentState->keyReleasedStates[(int32)keycode], state->keyReleasedStates[(int32)keycode]);
 	}
 }
 
 void Input_HandleKeyboardEvent(InputState* state, Keycode keycode, bool value, bool repeat)
 {
+	state->keyStates[(int32)keycode] = (int32)value;
 	if (value)
 	{
-		int value = repeat ? 2 : 1;
-		state->keyStates[(int32)keycode] = value;
-		state->keyPressedStates[(int32)keycode] = value;
-
-		state->fixedKeyPressedStates[(int32)keycode] = MaxI(state->fixedKeyPressedStates[(int32)keycode], value);
+		if (repeat)
+		{
+			state->keyPressedRepeatStates[(int32)keycode] = 1;
+		}
+		else
+		{
+			state->keyPressedStates[(int32)keycode] = 1;
+		}
 	}
 	if (!value)
 	{
-		state->keyStates[(int32)keycode] = 0;
 		state->keyReleasedStates[(int32)keycode] = 1;
+	}
 
-		state->fixedKeyReleasedStates[(int32)keycode] = MaxI(state->fixedKeyReleasedStates[(int32)keycode], 1);
+	if (state->dependent)
+	{
+		DependentHandleKeyboardInput(state, state->dependent, keycode, value);
 	}
 
 	if (state->onKeyboardEventHandled)
@@ -106,88 +105,84 @@ void Input_HandleKeyboardEvent(InputState* state, Keycode keycode, bool value, b
 	}
 }
 
-bool Input_GetKeyPressed(InputState* state, Keycode keycode, bool isFixed)
+bool Input_GetKeyPressed(InputState* state, Keycode keycode)
 {
-	return (isFixed ? state->fixedKeyPressedStates : state->keyPressedStates)[(int32)keycode] == 1;
+	return state->keyPressedStates[(int32)keycode] != 0;
 }
 
-bool Input_GetKeyPressedRepeat(InputState* state, Keycode keycode, bool isFixed)
+bool Input_GetKeyPressedRepeat(InputState* state, Keycode keycode)
 {
-	return (isFixed ? state->fixedKeyPressedStates : state->keyPressedStates)[(int32)keycode] != 0;
+	return state->keyPressedRepeatStates[(int32)keycode] != 0;
 }
 
-bool Input_GetKeyReleased(InputState* state, Keycode keycode, bool isFixed)
+bool Input_GetKeyReleased(InputState* state, Keycode keycode)
 {
-	return (isFixed ? state->fixedKeyReleasedStates : state->keyReleasedStates)[(int32)keycode] != 0;
+	return state->keyReleasedStates[(int32)keycode] != 0;
 }
 
-bool Input_GetKey(InputState* state, Keycode keycode, bool isFixed)
+bool Input_GetKey(InputState* state, Keycode keycode)
 {
-	// currently just use keyStates for both fixed and non-fixed key states.
 	return state->keyStates[(int32)keycode] != 0;
 }
 
-bool Input_GetMouseButton(InputState* state, int32 button, bool isFixed)
+bool Input_GetMouseButton(InputState* state, int32 button)
 {
 	if (button < 0 || button >= Input_MaxMouseButtons)
 	{
 		return false;
 	}
 
-	// currently just use mouseButtonStates for both fixed and non-fixed mouse states.
 	return state->mouseButtonStates[button] != 0;
 }
 
-bool Input_GetMouseButtonPressed(InputState* state, int32 button, bool isFixed)
+bool Input_GetMouseButtonPressed(InputState* state, int32 button)
 {
 	if (button < 0 || button >= Input_MaxMouseButtons)
 	{
 		return false;
 	}
 
-	return (isFixed ? state->fixedMouseButtonPressedStates : state->mouseButtonPressedStates)[button] == 1;
+	return state->mouseButtonPressedStates[button] == 1;
 }
 
-bool Input_GetMouseButtonReleased(InputState* state, int32 button, bool isFixed)
+bool Input_GetMouseButtonReleased(InputState* state, int32 button)
 {
 	if (button < 0 || button >= Input_MaxMouseButtons)
 	{
 		return false;
 	}
 
-	return (isFixed ? state->fixedMouseButtonReleasedStates : state->mouseButtonReleasedStates)[button] != 0;
+	return state->mouseButtonReleasedStates[button] != 0;
 }
 
-float Input_GetMouseX(InputState* state, bool isFixed)
+float Input_GetMouseX(InputState* state)
 {
-	// currently just use mouseX for both fixed and non-fixed.
-	return (isFixed ? state->mouseX : state->mouseX);
+	return state->mouseX;
 }
 
-float Input_GetMouseY(InputState* state, bool isFixed)
+float Input_GetMouseY(InputState* state)
 {
-	// currently just use mouseX for both fixed and non-fixed.
-	return (isFixed ? state->mouseY : state->mouseY);
+	return state->mouseY;
 }
 
-float Input_GetMouseMotionX(InputState* state, bool isFixed)
+float Input_GetMouseMotionX(InputState* state)
 {
-	return (isFixed ? state->fixedMouseDeltaX : state->mouseDeltaX);
+	return state->mouseDeltaX;
 }
 
-float Input_GetMouseMotionY(InputState* state, bool isFixed)
+float Input_GetMouseMotionY(InputState* state)
 {
-	return (isFixed ? state->fixedMouseDeltaY : state->mouseDeltaY);
+	return state->mouseDeltaY;
 }
 
-float Input_GetMouseWheelX(InputState* state, bool isFixed)
+float Input_GetMouseWheelX(InputState* state)
 {
-	return (isFixed ? state->fixedMouseWheelX : state->mouseWheelX);
+	return state->mouseWheelX;
 }
 
-float Input_GetMouseWheelY(InputState* state, bool isFixed)
+float Input_GetMouseWheelY(InputState* state)
 {
-	return (isFixed ? state->fixedMouseWheelY : state->mouseWheelY);
+	return state->mouseWheelY;
 }
 
 float Input_GetMouseWheelTickScalerX()
@@ -202,6 +197,19 @@ float Input_GetMouseWheelTickScalerY()
 	return 3;
 }
 
+static DependentHandleMouseButtonEvent(InputState* state, InputState* dependentState, int32 button, bool value)
+{
+	dependentState->mouseButtonStates[button] = state->mouseButtonStates[button];
+	if (value)
+	{
+		dependentState->mouseButtonPressedStates[button] = MaxI(dependentState->mouseButtonPressedStates[button], state->mouseButtonPressedStates[button]);
+	}
+	if (!value)
+	{
+		dependentState->mouseButtonReleasedStates[button] = MaxI(dependentState->mouseButtonReleasedStates[button], state->mouseButtonReleasedStates[button]);
+	}
+}
+
 void Input_HandleMouseButtonEvent(InputState* state, int32 button, bool value)
 {
 	if (button < 0 || button >= Input_MaxMouseButtons)
@@ -213,15 +221,16 @@ void Input_HandleMouseButtonEvent(InputState* state, int32 button, bool value)
 	{
 		state->mouseButtonStates[button] = 1;
 		state->mouseButtonPressedStates[button] = 1;
-
-		state->fixedMouseButtonPressedStates[button] = MaxI(state->fixedMouseButtonPressedStates[button], 1);
 	}
 	if (!value)
 	{
 		state->mouseButtonStates[button] = 0;
 		state->mouseButtonReleasedStates[button] = 1;
+	}
 
-		state->fixedMouseButtonReleasedStates[button] = MaxI(state->fixedMouseButtonReleasedStates[button], 1);
+	if (state->dependent)
+	{
+		DependentHandleMouseButtonEvent(state, state->dependent, button, value);
 	}
 }
 
@@ -231,24 +240,34 @@ void Input_HandleMouseMotionEvent(InputState* state, float x, float y, float del
 	state->mouseY = y;
 	state->mouseDeltaX += deltaX;
 	state->mouseDeltaY += deltaY;
-	state->fixedMouseDeltaX += deltaX;
-	state->fixedMouseDeltaY += deltaY;
+
+	if (state->dependent)
+	{
+		state->dependent->mouseX = state->mouseX;
+		state->dependent->mouseY = state->mouseY;
+		state->dependent->mouseDeltaX += deltaX;
+		state->dependent->mouseDeltaY += deltaY;
+	}
 }
 
 void Input_HandleWheelEvent(InputState* state, float x, float y)
 {
 	state->mouseWheelX += x;
 	state->mouseWheelY += y;
-	state->fixedMouseWheelX += x;
-	state->fixedMouseWheelY += y;
+
+	if (state->dependent)
+	{
+		state->dependent->mouseWheelX += x;
+		state->dependent->mouseWheelY += y;
+	}
 }
 
-int32 Input_GetGamePadStateIndex(InputState* state, int32 id)
+int32 Input_GetGamePadIndex(int32 id)
 {
 	for (int32 i = 0; i < Input_MaxGamePads; i++)
 	{
-		GamePadState* gamePadState = &state->gamePadStates[i];
-		if (gamePadState->isValid && gamePadState->id == id)
+		GamePadEntry* gamePadEntry = &gamePadEntries[i];
+		if (gamePadEntry->isValid && gamePadEntry->id == id)
 		{
 			return i;
 		}
@@ -256,9 +275,20 @@ int32 Input_GetGamePadStateIndex(InputState* state, int32 id)
 	return -1;
 }
 
+GamePadEntry* Input_GetGamePadEntry(int32 id)
+{
+	int32 index = Input_GetGamePadIndex(id);
+	if (index < 0)
+	{
+		return null;
+	}
+
+	return &gamePadEntries[index];
+}
+
 GamePadState* Input_GetGamePadState(InputState* state, int32 id)
 {
-	int32 index = Input_GetGamePadStateIndex(state, id);
+	int32 index = Input_GetGamePadIndex(id);
 	if (index < 0)
 	{
 		return null;
@@ -267,13 +297,13 @@ GamePadState* Input_GetGamePadState(InputState* state, int32 id)
 	return &state->gamePadStates[index];
 }
 
-int32 Input_GetGamePadCount(InputState* state)
+int32 Input_GetGamePadCount()
 {
 	int32 count = 0;
 	for (int32 i = 0; i < Input_MaxGamePads; i++)
 	{
-		GamePadState* gamePadState = &state->gamePadStates[i];
-		if (gamePadState->isValid)
+		GamePadEntry* gamePadEntry = &gamePadEntries[i];
+		if (gamePadEntry->isValid)
 		{
 			count++;
 		}
@@ -281,14 +311,14 @@ int32 Input_GetGamePadCount(InputState* state)
 	return count;
 }
 
-int32 Input_RegisterGamePad(InputState* state, int32 id, const char* name)
+int32 Input_RegisterGamePad(int32 id, const char* name)
 {
 	if (id < 0)
 	{
 		Error("id must be > 0.");
 	}
 
-	int32 index = Input_GetGamePadStateIndex(state, id);
+	int32 index = Input_GetGamePadIndex(id);
 	if (index >= 0)
 	{
 		ErrorF("gamepad with id %d already exists.", id);
@@ -296,8 +326,8 @@ int32 Input_RegisterGamePad(InputState* state, int32 id, const char* name)
 
 	for (int32 i = 0; i < Input_MaxGamePads; i++)
 	{
-		GamePadState* gamePadState = &state->gamePadStates[i];
-		if (!gamePadState->isValid)
+		GamePadEntry* gamePadEntry = &gamePadEntries[i];
+		if (!gamePadEntry->isValid)
 		{
 			index = i;
 			break;
@@ -311,41 +341,38 @@ int32 Input_RegisterGamePad(InputState* state, int32 id, const char* name)
 
 	name = name ? name : "unknown";
 
-	GamePadState* gamePadState = &state->gamePadStates[index];
-	gamePadState->isValid = true;
-	gamePadState->id = id;
-	StrCpy(gamePadState->name, name, MaxPathLength);
+	GamePadEntry* gamePadEntry = &gamePadEntries[index];
+	gamePadEntry->isValid = true;
+	gamePadEntry->id = id;
+	gamePadEntry->index = index;
+	StrCpy(gamePadEntry->name, name, MaxPathLength);
 
 	PrintF("registered gamepad with id %d \"%s\"\n", id, name);
-
-	if (state->onGamePadRegisterEventHandled)
-	{
-		state->onGamePadRegisterEventHandled(id, true);
-	}
 
 	return index;
 }
 
-void Input_UnregisterGamePad(InputState* state, int32 id)
+void Input_UnregisterGamePad(int32 id)
 {
 	if (id < 0)
 	{
 		Error("id must be > 0.");
 	}
 
-	GamePadState* gamePadState = Input_GetGamePadState(state, id);
-	if (!gamePadState)
+	GamePadEntry* gamePadEntry = Input_GetGamePadEntry(id);
+	
+	if (!gamePadEntry)
 	{
 		Error("gamepad with id %d does not exist.");
 	}
 
-	if (state->onGamePadRegisterEventHandled)
-	{
-		state->onGamePadRegisterEventHandled(id, false);
-	}
+	PrintF("unregistered gamepad with id %d \"%s\"\n", id, gamePadEntry->name);
+	MemSet(gamePadEntry, 0, sizeof(GamePadEntry));
+}
 
-	PrintF("unregistered gamepad with id %d \"%s\"\n", id, gamePadState->name);
-	MemSet(gamePadState, 0, sizeof(GamePadState));
+static bool ValueIsActive(int16 value)
+{
+	return AbsI(value) >= Input_GamePadActivationThreshold;
 }
 
 void Input_HandleGamepadInputEvent(InputState* state, int32 id, GamePadInput input, int16 value)
@@ -356,65 +383,86 @@ void Input_HandleGamepadInputEvent(InputState* state, int32 id, GamePadInput inp
 	{
 		ErrorF("GamePadInput out of range \"%d\"", (int32)input);
 	}
+
 	GamePadState* gamePadState = Input_GetGamePadState(state, id);
 	if (gamePadState)
 	{
+		gamePadState->prevValues[(int32)input] = gamePadState->values[(int32)input];
 		gamePadState->values[(int32)input] = value;
-
-		// allow fixed values to increase value, or change axis direction with each non fixed input event.
-		if (SignI(gamePadState->fixedValues[(int32)input]) != SignI(value) || AbsI(value) > AbsI(gamePadState->fixedValues[(int32)input]))
+		bool isActive = ValueIsActive(gamePadState->values[(int32)input]);
+		bool wasActive = ValueIsActive(gamePadState->prevValues[(int32)input]);
+		if (isActive && wasActive)
 		{
-			gamePadState->fixedValues[(int32)input] = value;
+			// special case if an analog stick immediately changed sign but stayed active.
+			if (SignI(gamePadState->prevValues[(int32)input]) != SignI(value))
+			{
+				gamePadState->pressed[(int32)input] = SignI(value);
+				gamePadState->released[(int32)input] = SignI(gamePadState->prevValues[(int32)input]);
+			}
 		}
-	}
+		else if (isActive && !wasActive)
+		{
+			gamePadState->pressed[(int32)input] = SignI(value);
+		}
+		else if (wasActive && !isActive)
+		{
+			gamePadState->released[(int32)input] = SignI(gamePadState->prevValues[(int32)input]);
+		}
 
-	if (state->onGamePadInputEventHandled)
-	{
-		state->onGamePadInputEventHandled(id, input, value);
+#if 1
+		if (state->dependent)
+		{
+			Input_HandleGamepadInputEvent(state->dependent, id, input, value);
+		}
+#else
+		// allow dependent values to increase value, or change axis direction with each non dependent input event.
+		if (state->dependent)
+		{
+			GamePadState* dependentGamePadState = Input_GetGamePadState(state->dependent, id);
+			if (dependentGamePadState)
+			{
+				if (SignI(dependentGamePadState->values[(int32)input]) != SignI(value) || AbsI(value) > AbsI(dependentGamePadState->values[(int32)input]))
+				{
+					dependentGamePadState->values[(int32)input] = value;
+				}
+			}
+		}
+#endif
 	}
 }
 
-int16 Input_GetGamePadInput(InputState* state, int32 id, GamePadInput input, bool isFixed)
+int16 Input_GetGamePadInput(InputState* state, int32 id, GamePadInput input)
 {
 	GamePadState* gamePadState = Input_GetGamePadState(state, id);
 	if (!gamePadState)
 	{
 		return 0;
 	}
-	int16* values = isFixed ? gamePadState->fixedValues : gamePadState->values;
-	return values[(int32)input];
+	return gamePadState->values[(int32)input];
 }
 
-static bool ValueIsActive(int16 value)
+bool Input_GetGamePadInputActive(InputState* state, int32 id, GamePadInput input)
 {
-	return AbsI(value) >= Input_GamePadActivationThreshold;
+	return ValueIsActive(Input_GetGamePadInput(state, id, input));
 }
 
-bool Input_GetGamePadInputActive(InputState* state, int32 id, GamePadInput input, bool isFixed)
-{
-	return ValueIsActive(Input_GetGamePadInput(state, id, input, isFixed));
-}
-
-bool Input_GetGamePadInputPressed(InputState* state, int32 id, GamePadInput input, bool isFixed)
+bool Input_GetGamePadInputPressed(InputState* state, int32 id, GamePadInput input)
 {
 	GamePadState* gamePadState = Input_GetGamePadState(state, id);
 	if (!gamePadState)
 	{
 		return false;
 	}
-	int16* lastValues = isFixed ? gamePadState->fixedLastValues : gamePadState->lastValues;
-	uint8 lastActive = ValueIsActive(lastValues[(int32)input]);
-	return Input_GetGamePadInputActive(state, id, input, isFixed) && !lastActive;
+	return !!gamePadState->pressed[(int32)input];
 }
 
-bool Input_GetGamePadInputReleased(InputState* state, int32 id, GamePadInput input, bool isFixed)
+bool Input_GetGamePadInputReleased(InputState* state, int32 id, GamePadInput input)
 {
 	GamePadState* gamePadState = Input_GetGamePadState(state, id);
 	if (!gamePadState)
 	{
 		return false;
 	}
-	int16* lastValues = isFixed ? gamePadState->fixedLastValues : gamePadState->lastValues;
-	uint8 lastActive = ValueIsActive(lastValues[(int32)input]);
-	return !Input_GetGamePadInputActive(state, id, input, isFixed) && lastActive;
+
+	return !!gamePadState->released[(int32)input];
 }

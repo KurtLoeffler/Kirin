@@ -93,7 +93,7 @@ Keycode ZXSDL2KeycodeToKey(SDL_Keycode scancode)
 	}
 }
 
-static void TryAddGamePadDevice(InputState* state, int32 joystickIndex)
+static void TryAddGamePadDevice(int32 joystickIndex)
 {
 	if (SDL_IsGameController(joystickIndex))
 	{
@@ -108,7 +108,7 @@ static void TryAddGamePadDevice(InputState* state, int32 joystickIndex)
 			ZXPrintF("joystick guid: %s\n", guid);
 #endif
 			int32 id = SDL_JoystickInstanceID(joystick);
-			Input_RegisterGamePad(state, id, SDL_GameControllerName(gameController));
+			Input_RegisterGamePad(id, SDL_GameControllerName(gameController));
 		}
 		else
 		{
@@ -117,11 +117,11 @@ static void TryAddGamePadDevice(InputState* state, int32 joystickIndex)
 	}
 }
 
-static void TryRemoveGamePadDevice(InputState* state, int32 id)
+static void TryRemoveGamePadDevice(int32 id)
 {
-	if (Input_GetGamePadStateIndex(state, id) >= 0)
+	if (Input_GetGamePadIndex(id) >= 0)
 	{
-		Input_UnregisterGamePad(state, id);
+		Input_UnregisterGamePad(id);
 	}
 }
 
@@ -192,11 +192,11 @@ void SDL2Input_HandleEvent(InputState* state, SDL_Event* event)
 	}
 	else if (event->type == SDL_CONTROLLERDEVICEADDED)
 	{
-		TryAddGamePadDevice(state, event->cdevice.which);
+		TryAddGamePadDevice(event->cdevice.which);
 	}
 	else if (event->type == SDL_CONTROLLERDEVICEREMOVED)
 	{
-		TryRemoveGamePadDevice(state, event->cdevice.which);
+		TryRemoveGamePadDevice(event->cdevice.which);
 	}
 	else if (event->type == SDL_CONTROLLERAXISMOTION || event->type == SDL_CONTROLLERBUTTONUP || event->type == SDL_CONTROLLERBUTTONDOWN)
 	{
@@ -299,7 +299,7 @@ void SDL2Input_HandleEvent(InputState* state, SDL_Event* event)
 
 		if (input > GamePadInput_None && input < GamePadInput_Count)
 		{
-			if (Input_GetGamePadStateIndex(state, id) >= 0)
+			if (Input_GetGamePadIndex(id) >= 0)
 			{
 				Input_HandleGamepadInputEvent(state, id, input, value);
 			}
