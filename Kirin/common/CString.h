@@ -32,6 +32,10 @@ char ToUpper(char a);
 wchar_t ToUpperW(wchar_t a);
 char ToLower(char a);
 wchar_t ToLowerW(wchar_t a);
+void StrToUpper(char* value, int64 count);
+void StrToUpperW(wchar_t* value, int64 count);
+void StrToLower(char* value, int64 count);
+void StrToLowerW(wchar_t* value, int64 count);
 // sourceLength is the number of characters to convert, or -1.
 // returns the a pointer to a newly allocated wide string.
 wchar_t* CStringToWideStringAlloc(const char* source, int64 sourceLength);

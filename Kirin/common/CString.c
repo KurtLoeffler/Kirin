@@ -259,6 +259,62 @@ wchar_t ToLowerW(wchar_t a)
 	return (wchar_t)towlower(a);
 }
 
+void StrToUpper(char* value, int64 count)
+{
+	if (count < 0)
+	{
+		count = Int64Max;
+	}
+	while (*value && count > 0)
+	{
+		*value = ToUpper(*value);
+		value++;
+		count--;
+	}
+}
+
+void StrToUpperW(wchar_t* value, int64 count)
+{
+	if (count < 0)
+	{
+		count = Int64Max;
+	}
+	while (*value && count > 0)
+	{
+		*value = ToUpperW(*value);
+		value++;
+		count--;
+	}
+}
+
+void StrToLower(char* value, int64 count)
+{
+	if (count < 0)
+	{
+		count = Int64Max;
+	}
+	while (*value && count > 0)
+	{
+		*value = ToLower(*value);
+		value++;
+		count--;
+	}
+}
+
+void StrToLowerW(wchar_t* value, int64 count)
+{
+	if (count < 0)
+	{
+		count = Int64Max;
+	}
+	while (*value && count > 0)
+	{
+		*value = ToLowerW(*value);
+		value++;
+		count--;
+	}
+}
+
 wchar_t* CStringToWideStringAlloc(const char* source, int64 sourceLength)
 {
 	int64 required = CStringToWideString(null, -1, source, sourceLength)+1;
